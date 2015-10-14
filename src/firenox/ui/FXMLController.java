@@ -72,6 +72,6 @@ public class FXMLController {
     }
 
     public void handleLikesButton(ActionEvent actionEvent) {
-        UIManager.showFavorites(null);
+        UIManager.showFavorites();
     }
 }

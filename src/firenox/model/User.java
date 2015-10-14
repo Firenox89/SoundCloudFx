@@ -1,6 +1,7 @@
 package firenox.model;
 
 import com.soundcloud.api.Endpoints;
+import firenox.io.Http;
 import firenox.io.LogInHandler;
 import firenox.logger.Logger;
 import org.json.JSONArray;
@@ -21,11 +22,9 @@ public class User {
     String permalink_url;
     String avatar_url;
     ArrayList<Track> favList = new ArrayList<>();
-    boolean favLoaded = false;
-    private JSONObject jsonObject;
+    private int LIMIT = 10;
 
     public User(JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
         parseJSON(jsonObject);
     }
 
@@ -53,23 +52,62 @@ public class User {
 
     private void loadTracks() {
         try {
-            String json = LogInHandler.getStringWithLimit(Endpoints.MY_FAVORITES, 5);
+            String json = LogInHandler.getStringWithLimit(Endpoints.MY_FAVORITES, LIMIT, 0);
+//            System.out.println(Http.formatJSON(json));
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
                 favList.add(new Track((JSONObject) jsonArray.get(i)));
             }
-            favLoaded = true;
 //            json.keys().forEachRemaining(System.out::println);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    private String next_href = null;
+    private boolean allLoaded = false;
+
+    public ArrayList<Track> loadNextTracks() {
+        ArrayList<Track> newTracks = null;
+        if (!allLoaded) {
+            try {
+                newTracks = new ArrayList<>();
+                int page = 1;
+                String json;
+                if (next_href == null) {
+                    json = LogInHandler.getStringWithLimit(Endpoints.MY_FAVORITES, LIMIT, page);
+                } else {
+                    json = LogInHandler.getString(next_href);
+                }
+//                System.out.println(Http.formatJSON(json));
+                JSONObject response = new JSONObject(json);
+                JSONArray jsonArray = response.getJSONArray("collection");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    newTracks.add(new Track((JSONObject) jsonArray.get(i)));
+                }
+                next_href = response.getString("next_href");
+                if (next_href == null) {
+                    allLoaded = true;
+                }
+                favList.addAll(newTracks);
+//            json.keys().forEachRemaining(System.out::println);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return newTracks;
+    }
+
     public ArrayList<Track> getFavList() {
-        if (!favLoaded) {
-            loadTracks();
+        if (favList.isEmpty() && !allLoaded) {
+            loadNextTracks();
         }
         return favList;
+    }
+
+    public boolean isAllLoaded()
+    {
+      return allLoaded;
     }
 
     public int getId() {

@@ -30,12 +30,15 @@ public class AudioPlayerFx implements IAudioPlayer {
 
     @Override
     public void play() {
-        log.d("Play");
         if (player != null) {
             if (isPlaying) {
                 player.pause();
+                isPlaying = false;
+                log.d("Pause");
             } else {
                 player.play();
+                isPlaying = true;
+                log.d("Play");
             }
         }
     }
@@ -118,18 +121,6 @@ public class AudioPlayerFx implements IAudioPlayer {
 
     public void setProgressTimeListener(ChangeListener<Duration> listener) {
         player.currentTimeProperty().addListener(listener);
-    }
-
-    @Override
-    public double getProgressInSeconds() {
-//        double proVgress = 0;
-//        if (player != null)
-//        {
-//            player.
-//            progress = player.getBufferProgressTime().toSeconds();
-//        }
-//        return progress;
-        return 0;
     }
 
 }

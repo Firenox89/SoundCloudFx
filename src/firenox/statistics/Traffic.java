@@ -16,21 +16,23 @@ public class Traffic {
     private static int jsonTraffic;
     private static int jsonConnects;
 
+    //TODO: make that less spammy
     public static void addImageTraffic(int numberOfBytes) {
         imageTraffic += numberOfBytes;
         imageConnects++;
-        log.d("imageTraffic = " + imageTraffic);
+        log.i("imageTraffic = " + imageTraffic);
     }
 
+    //TODO: Ask that from the player if possible
     public static void addMP3Traffic(int numberOfBytes) {
         mp3Traffic += numberOfBytes;
         mp3Connects++;
-        log.d("mp3Traffic = " + mp3Traffic);
+        log.i("mp3Traffic = " + mp3Traffic);
     }
 
     public static void addJSONTraffic(int numberOfBytes) {
         jsonTraffic += numberOfBytes;
         jsonConnects++;
-        log.d("jsonTraffic = " + jsonTraffic);
+        log.i("jsonTraffic = " + jsonTraffic);
     }
 }

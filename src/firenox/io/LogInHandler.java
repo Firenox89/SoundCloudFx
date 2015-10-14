@@ -24,13 +24,6 @@ import java.util.Properties;
 public class LogInHandler {
     private static final File WRAPPER_SER = new File("wrapper.ser");
     private static Properties credentials = new Properties();
-    private static String CLIENT_ID = credentials.getProperty("client.id");
-    private static String CLIENT_SECRET = credentials.getProperty("client.secret");
-    private static String DEFAULT_LOGIN = credentials.getProperty("default.login");
-    private static String DEFAULT_PASS = credentials.getProperty("default.pass");
-    private static LogInHandler instance = new LogInHandler();
-    private static Logger log = Logger.getLogger(LogInHandler.class.getName());
-
     static {
         try {
             credentials.load(new FileInputStream(new File("credentials.properties")));
@@ -38,6 +31,13 @@ public class LogInHandler {
             e.printStackTrace();
         }
     }
+    private static String CLIENT_ID = credentials.getProperty("client.id");
+    private static String CLIENT_SECRET = credentials.getProperty("client.secret");
+    private static String DEFAULT_LOGIN = credentials.getProperty("default.login");
+    private static String DEFAULT_PASS = credentials.getProperty("default.pass");
+    private static LogInHandler instance = new LogInHandler();
+    private static Logger log = Logger.getLogger(LogInHandler.class.getName());
+
 
     private ApiWrapper wrapper;
     private boolean loggedIn;
@@ -65,9 +65,17 @@ public class LogInHandler {
         return instance.wrapper.get(request);
     }
 
-    public static HttpResponse requestWithLimit(String request, int limit) throws IOException {
-        Request request1 = Request.to(request).add("limit", limit);
-        return instance.wrapper.get(request1);
+    public static HttpResponse requestWithLimit(String requestUrl, int limit, int page) throws IOException {
+        Request request = null;
+        if (page == 0)
+        {
+            request = Request.to(requestUrl).add("limit", limit);
+        }
+        else
+        {
+            request = Request.to(requestUrl).add("limit", limit).add("linked_partitioning", page);
+        }
+        return instance.wrapper.get(request);
     }
 
     public static Stream requestStream(String request) throws IOException {
@@ -108,10 +116,10 @@ public class LogInHandler {
         return is;
     }
 
-    public static String getStringWithLimit(String url, int limit) {
+    public static String getStringWithLimit(String url, int limit, int page) {
         String string = null;
         try {
-            string = Http.getString(requestWithLimit(url, limit));
+            string = Http.getString(requestWithLimit(url, limit, page));
         } catch (IOException e) {
             e.printStackTrace();
         }

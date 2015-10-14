@@ -1,11 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'eclipse'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.6
-version = '1.3.1-SNAPSHOT'
-group   = 'com.soundcloud'
+sourceCompatibility = 1.8
+version = '0.0.1'
+group   = 'firenox'
 
 repositories   { mavenCentral() }
 
@@ -39,17 +38,10 @@ uploadArchives {
      }
      pom {
        project {
-         name        'SoundCloud Java API wrapper'
-         description 'SoundCloud Java API wrapper (OAuth2 only), works on Android'
-         url 'https://github.com/soundcloud/java-api-wrapper#readme'
+         name        'SoundCloudFx'
+         description 'JavaFx based Soundcloud Player'
+         url 'https://github.com/firenox89/soundcloudfx#readme'
          inceptionYear '2011'
-         licenses {
-           license {
-             name         'The MIT License'
-             url          'https://github.com/soundcloud/java-api-wrapper/raw/master/LICENSE'
-             distribution 'repo'
-           }
-         }
        }
        withXml { xml ->
           new XmlParser().parse(new File("pom-include.xml")).children().each { kid -> xml.asNode().append(kid) }
@@ -66,23 +58,6 @@ ext.httpDebug = ['org.apache.commons.logging.Log': 'org.apache.commons.logging.i
              'org.apache.commons.logging.simplelog.log.org.apache.http': 'DEBUG',
              'org.apache.commons.logging.simplelog.log.org.apache.http.wire': 'ERROR']
 
-def example(name, mainClass, arguments) {
-  task(name, dependsOn: ['compileJava', 'compileExamplesJava']) << {
-    javaexec {
-      main = 'com.soundcloud.api.examples.'+mainClass
-      classpath = sourceSets.main.runtimeClasspath + sourceSets.examples.output
-      if (logger.debugEnabled) systemProperties ext.httpDebug
-      args arguments.call()
-    }
-  }
-}
-example('createWrapper', 'CreateWrapper', { [client_id, client_secret, login, password] })
-example('facebookLogin', 'FacebookLogin', { [] })
-example('getResource',   'GetResource',   { resource })
-example('putResource',   'PutResource',   { [resource, content, contentType] })
-example('postResource',  'PostResource',  { [resource, content, contentType] })
-example('uploadFile',    'UploadFile',    { file })
-example('dumpToken',     'DumpToken',     { [] })
 
 task writePom << {
   uploadArchives.repositories.mavenDeployer().getPom().writeTo("pom.xml")
@@ -118,8 +93,4 @@ def getAuth(repo_id) {
     if (repo != null) return [userName: repo.username.text(), password: repo.password.text()]
    }
    [:]
-}
-
-task printDebug << {
-  println ext.httpDebug.collect { "-D"+it.key+"="+it.value }.join(' ')
 }

@@ -1,0 +1,39 @@
+Build
+    Fix gradle file to actually build this thing (just used for dependency fetching at the moment)
+
+UI
+    Menu...
+    Search bar
+    More Scenes -> Player, User, Tracks, ...
+    Symbols for volume and repeat
+    Tile display for playlists, user...
+    Buttons for like, repost, add to playlist, share
+    Stats traffic, playback
+    History
+    Notification
+    Keyboard shortcuts
+    Tags
+    Comments
+    Put styling into css files
+
+Logic
+    UI corresponding things
+    Rename & Refactor LogInHandler
+    Playlists handling (in player or somewhere else)
+    Next Previous Button logic
+    Models for playlist
+    Follower/Following
+
+Misc
+    check artwork/wave, they sometimes get corrupted
+
+JavaDoc
+    EVERYWHERE
+
+Features
+    Remote control via Network (maybe web interface)
+    Download tracks if better quality is available
+
+Tests
+    Tests in general
+    Test on Windows

@@ -21,10 +21,10 @@ public class ModelManager {
 
 
     public static String CACHE_PATH_FALLBACK = System.getProperty("java.io.tmpdir") + File.separator + "soundcloudFx";
-    public static String ARTWORKS_CACHE_PATH = CACHE_PATH + File.separator + "artworks";
-    public static String WAVE_CACHE_PATH = CACHE_PATH + File.separator + "waves";
     private static Properties properties = new Properties();
     public static String CACHE_PATH = properties.getProperty("caching.path", CACHE_PATH_FALLBACK);
+    public static String ARTWORKS_CACHE_PATH = CACHE_PATH + File.separator + "artworks";
+    public static String WAVE_CACHE_PATH = CACHE_PATH + File.separator + "waves";
     private static HashMap<String, User> userList = new HashMap<>();
     private static HashMap<String, Track> trackList = new HashMap<>();
     private static ModelManager instance = new ModelManager();
@@ -73,9 +73,21 @@ public class ModelManager {
         return getUser(Endpoints.MY_DETAILS).getFavList();
     }
 
+    /**
+     * Add next page to the FavList.
+     *
+     * @return true if there are more to load.
+     */
+    public static ArrayList<Track> loadNextFav()
+    {
+        return getUser(Endpoints.MY_DETAILS).loadNextTracks();
+    }
+
+
+
     public static void getPlaylists() {
         try {
-            HttpResponse resp = LogInHandler.requestWithLimit(Endpoints.PLAYLISTS, 5);
+            HttpResponse resp = LogInHandler.requestWithLimit(Endpoints.PLAYLISTS, 5, 0);
             System.out.println(resp.getStatusLine().getReasonPhrase());
             Thread.sleep(1000);
             String response = Http.formatJSON(Http.getString(resp));

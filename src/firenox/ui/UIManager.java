@@ -39,11 +39,8 @@ public class UIManager {
         stage.show();
     }
 
-    public static void showFavorites(ArrayList<Track> favList) {
-        if (favList == null) {
-            favList = ModelManager.getLikes();
-        }
-        new FavoriteScene(favList);
+    public static void showFavorites() {
+        new FavoriteScene();
     }
 
     public static FXMLController getController() {
