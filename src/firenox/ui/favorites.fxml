@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.net.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.60"
+            fx:controller="firenox.ui.FXMLController">
+    <bottom>
+        <FlowPane fx:id="panel" alignment="CENTER" columnHalignment="CENTER" prefHeight="52.0" prefWidth="600.0"
+                  BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="prevBtn" mnemonicParsing="false" onAction="#handlePrevButton">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                    <stylesheets>
+                        <URL value="@mediaButtons.css"/>
+                        <URL value="@mediaButtons.css"/>
+                    </stylesheets>
+                </Button>
+                <Button fx:id="playBtn" mnemonicParsing="false" onAction="#handlePlayButton">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                    <stylesheets>
+                        <URL value="@mediaButtons.css"/>
+                        <URL value="@mediaButtons.css"/>
+                    </stylesheets>
+                </Button>
+                <Button fx:id="nextBtn" mnemonicParsing="false" onAction="#handleNextPlayButton"
+                        stylesheets="@mediaButtons.css">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </Button>
+                <Button mnemonicParsing="false" stylesheets="@mediaButtons.css" text="R">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                </Button>
+                <Slider fx:id="progressSlider" prefHeight="16.0" prefWidth="277.0" stylesheets="@mediaButtons.css">
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                </Slider>
+                <Button fx:id="volumeBtn" mnemonicParsing="false" onAction="#handleVolumeButton"
+                        stylesheets="@mediaButtons.css" text="V">
+                    <FlowPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </FlowPane.margin>
+                    <contextMenu>
+                        <ContextMenu fx:id="volumeContext" anchorLocation="WINDOW_TOP_LEFT">
+                            <items>
+                                <MenuItem mnemonicParsing="false">
+                                    <graphic>
+                                        <Slider fx:id="volumeSlider" blockIncrement="0.05" max="1.0"
+                                                orientation="VERTICAL" value="1.0"/>
+                                    </graphic>
+                                </MenuItem>
+                            </items>
+                        </ContextMenu>
+                    </contextMenu>
+                </Button>
+                <ImageView fx:id="artWork" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@shinbuAva.png"/>
+                    </image>
+                    <FlowPane.margin>
+                        <Insets/>
+                    </FlowPane.margin>
+                </ImageView>
+                <Label fx:id="titleLabel" prefHeight="16.0" text="Title">
+                    <FlowPane.margin>
+                        <Insets left="10.0"/>
+                    </FlowPane.margin>
+                    <stylesheets>
+                        <URL value="@mediaButtons.css"/>
+                        <URL value="@mediaButtons.css"/>
+                    </stylesheets>
+                </Label>
+            </children>
+            <BorderPane.margin>
+                <Insets/>
+            </BorderPane.margin>
+            <stylesheets>
+                <URL value="@mediaButtons.css"/>
+                <URL value="@mediaButtons.css"/>
+            </stylesheets>
+        </FlowPane>
+    </bottom>
+    <top>
+        <FlowPane fx:id="menuPanel" alignment="CENTER" columnHalignment="CENTER" prefHeight="43.0" prefWidth="600.0"
+                  BorderPane.alignment="CENTER">
+            <stylesheets>
+                <URL value="@menuPanel.css"/>
+                <URL value="@menuPanel.css"/>
+            </stylesheets>
+            <children>
+                <Button fx:id="playlistButton" mnemonicParsing="false" onAction="#handlePlaylistButton"
+                        text="Playlists"/>
+                <Button fx:id="likesButton" mnemonicParsing="false" onAction="#handleLikesButton" text="Likes"/>
+            </children>
+        </FlowPane>
+    </top>
+    <center>
+        <ScrollPane fx:id="mainScrollPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+    </center>
+</BorderPane>
