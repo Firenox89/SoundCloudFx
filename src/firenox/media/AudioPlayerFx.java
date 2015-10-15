@@ -18,6 +18,8 @@ public class AudioPlayerFx implements IAudioPlayer {
     private boolean isPlaying = false;
     private double volume = 0.2;
     private Property<Number> volumeSliderProb;
+    private Runnable nextHandler;
+    private Runnable previousHandler;
 
     AudioPlayerFx() {
     }
@@ -91,15 +93,18 @@ public class AudioPlayerFx implements IAudioPlayer {
     @Override
     public void next() {
         log.d("next");
-        if (player != null) {
-
+        if (nextHandler != null) {
+            nextHandler.run();
         }
     }
 
     @Override
     public void previous() {
         log.d("previous");
-
+        if (previousHandler != null)
+        {
+            previousHandler.run();
+        }
     }
 
     @Override
@@ -134,6 +139,16 @@ public class AudioPlayerFx implements IAudioPlayer {
 
     public void setProgressTimeListener(ChangeListener<Duration> listener) {
         player.currentTimeProperty().addListener(listener);
+    }
+
+    public void setNextHandler(Runnable next)
+    {
+        nextHandler = next;
+    }
+
+    public void setPreviousHandler(Runnable previous)
+    {
+        previousHandler = previous;
     }
 
     public void seek()

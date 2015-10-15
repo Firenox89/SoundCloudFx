@@ -31,6 +31,7 @@ public class FavoriteScene {
     private VBox vbox;
     private FXMLController controller;
     private ArrayList<Track> favList;
+    private Track currentTrack;
 
     public FavoriteScene() {
         controller = UIManager.getController();
@@ -40,6 +41,8 @@ public class FavoriteScene {
         favList = ModelManager.getLikes();
         setFavorites(favList);
 
+        AudioManager.getPlayerFx().setNextHandler(() -> playNextTrack());
+        AudioManager.getPlayerFx().setPreviousHandler(() -> playPreviousTrack());
     }
 
     public void setFavorites(ArrayList<Track> favList) {
@@ -86,22 +89,30 @@ public class FavoriteScene {
         return box;
     }
 
-    private void playNextTrack(Track track) {
-        int current = favList.indexOf(track);
+    public void playNextTrack() {
+        int current = favList.indexOf(currentTrack);
         if (current == favList.size()) {
             loadNextFav();
         }
         setTrack(favList.get(++current));
     }
 
+    public void playPreviousTrack() {
+        int current = favList.indexOf(currentTrack);
+        if (current > 1) {
+            setTrack(favList.get(--current));
+        }
+    }
+
     private void setTrack(Track track) {
         try {
 //            AudioManager.getPlayerFx().open(track.getTempFileURL());
+            currentTrack = track;
             AudioManager.getPlayerFx().open(track.getStreamURL());
             controller.getArtWork().setImage(new Image(track.getArtwork().getLargeAsStream(), 40, 40, true, true));
             controller.getTitleLabel().setText(track.getTitle());
             controller.getProgressSlider().setMax(track.getDuration() / 1000);
-            AudioManager.getPlayerFx().setMediaEndListener(() -> playNextTrack(track));
+            AudioManager.getPlayerFx().setMediaEndListener(() -> playNextTrack());
             AudioManager.getPlayerFx().setProgressTimeListener((observable, oldValue, newValue) ->
             {
                 controller.getProgressSlider().setValue(newValue.toSeconds());
@@ -109,7 +120,7 @@ public class FavoriteScene {
             });
         } catch (CloudAPI.ResolverException re) {
             re.printStackTrace();
-            playNextTrack(track);
+            playNextTrack();
         } catch (IOException e) {
             e.printStackTrace();
         }

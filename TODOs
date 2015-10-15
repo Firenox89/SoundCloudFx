@@ -24,6 +24,7 @@ Logic
     Next Previous Button logic
     Models for playlist
     Follower/Following
+    Serialization of tracks, user...
 
 Misc
     check artwork/wave, they sometimes get corrupted
