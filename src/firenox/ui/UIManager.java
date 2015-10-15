@@ -1,12 +1,18 @@
 package firenox.ui;
 
+import firenox.media.AudioManager;
 import firenox.model.ModelManager;
 import firenox.model.Track;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -35,6 +41,7 @@ public class UIManager {
             e.printStackTrace();
         }
         controller = loader.getController();
+        AudioManager.getPlayerFx().bindVolume(controller.getVolumeSlider().valueProperty());
         stage.setScene(new Scene(root, 800, 600));
         stage.show();
     }
@@ -48,6 +55,17 @@ public class UIManager {
     }
 
     public static void showPlaylists() {
-        ModelManager.getPlaylists();
+        ScrollPane pane = controller.getMainScrollPane();
+
+        try {
+            Canvas canvas = WaveRenderer.init(
+                    new FileInputStream(new File("/home/firenox/soundcloudFx/waves/0DDVFp5Ibia6_m.png")),
+                    650, 80).renderToFxCanvas();
+            pane.setContent(canvas);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        ModelManager.getPlaylists();
     }
 }

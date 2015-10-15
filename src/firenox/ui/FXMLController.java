@@ -11,33 +11,23 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 
 public class FXMLController {
-    @FXML
-    private Label titleLabel;
-    @FXML
-    private ImageView artWork;
-    @FXML
-    private Slider progressSlider;
-    @FXML
-    private Slider volumeSlider;
-    @FXML
-    private Button volumeBtn;
-    @FXML
-    private ContextMenu volumeContext;
-    @FXML
-    private ScrollPane mainScrollPane;
+    @FXML private Label titleLabel;
+    @FXML private ImageView artWork;
+    @FXML private Slider progressSlider;
+    @FXML private Slider volumeSlider;
+    @FXML private Button volumeBtn;
+    @FXML private ContextMenu volumeContext;
+    @FXML private ScrollPane mainScrollPane;
 
-    @FXML
-    protected void handlePrevButton(ActionEvent event) {
+    @FXML protected void handlePrevButton(ActionEvent event) {
         AudioManager.getPlayerFx().previous();
     }
 
-    @FXML
-    protected void handlePlayButton(ActionEvent event) {
+    @FXML protected void handlePlayButton(ActionEvent event) {
         AudioManager.getPlayerFx().play();
     }
 
-    @FXML
-    protected void handleNextPlayButton(ActionEvent event) {
+    @FXML protected void handleNextPlayButton(ActionEvent event) {
         AudioManager.getPlayerFx().next();
     }
 

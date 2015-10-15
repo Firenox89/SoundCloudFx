@@ -2,6 +2,7 @@ package firenox.model;
 
 import firenox.logger.Logger;
 import firenox.ui.WaveRenderer;
+import javafx.scene.canvas.Canvas;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,16 +17,28 @@ public class WaveForm extends CacheableImage {
     private static Logger log = new Logger(WaveForm.class.getName());
     private static Map<String, File> cacheIndex = CacheableImage.indexCache(ModelManager.WAVE_CACHE_PATH);
     private final String orginalWaveUrl;
+    private WaveRenderer waveRender;
 
     public WaveForm(String url) {
         orginalWaveUrl = url;
     }
 
-    public InputStream getRenderedWaveAsStream(int width, int height) throws IOException {
-        String filePath = getCachePath() + File.separator + getNameFromUrl(orginalWaveUrl);
-        filePath = filePath.substring(0, filePath.length() - 4) + "R" + width + "x" + height + ".png";
-        File file = WaveRenderer.renderWaveToFile(getResourceAsStream(orginalWaveUrl, cacheIndex), width, height, filePath);
-        return new FileInputStream(file);
+    public Canvas getCanvas(int width, int height)
+    {
+        try {
+        if (waveRender == null)
+        {
+            waveRender = WaveRenderer.init(getResourceAsStream(orginalWaveUrl, cacheIndex), width, height);
+        }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return waveRender.renderToFxCanvas();
+    }
+
+    public void progressAnimation(double progress)
+    {
+        waveRender.renderProgress(progress);
     }
 
     @Override

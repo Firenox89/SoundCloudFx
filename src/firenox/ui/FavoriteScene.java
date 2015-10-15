@@ -1,11 +1,13 @@
 package firenox.ui;
 
+import com.soundcloud.api.CloudAPI;
 import firenox.io.BackgroundLoader;
 import firenox.media.AudioManager;
 import firenox.model.ArtWork;
 import firenox.model.ModelManager;
 import firenox.model.Track;
 import firenox.model.WaveForm;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -14,7 +16,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -39,8 +40,6 @@ public class FavoriteScene {
         favList = ModelManager.getLikes();
         setFavorites(favList);
 
-        controller.getVolumeSlider().valueProperty().addListener((observable, oldValue, newValue) ->
-                AudioManager.getPlayerFx().setVolume(newValue.doubleValue()));
     }
 
     public void setFavorites(ArrayList<Track> favList) {
@@ -48,15 +47,17 @@ public class FavoriteScene {
 
         //if viewport reaches the bottom, fetch and a new tracks
         scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() > 0.98)
-            {
-                ArrayList<Track> newTracks = ModelManager.loadNextFav();
-                if (newTracks != null)
-                {
-                    newTracks.forEach(t -> vbox.getChildren().add(buildTrackContainer(t)));
-                }
+            if (newValue.doubleValue() > 0.98) {
+                loadNextFav();
             }
         });
+    }
+
+    private void loadNextFav() {
+        ArrayList<Track> newTracks = ModelManager.loadNextFav();
+        if (newTracks != null) {
+            newTracks.forEach(t -> vbox.getChildren().add(buildTrackContainer(t)));
+        }
     }
 
 
@@ -66,17 +67,13 @@ public class FavoriteScene {
         ArtWork artwork = track.getArtwork();
         WaveForm waveForm = track.getWaveform();
         ImageView artwork_view = new ImageView();
-        ImageView wave_view = new ImageView();
+        Canvas wave_view = waveForm.getCanvas(waveWidth, waveHeigth);
 
-        try {
-            asyncAdd(wave_view, waveForm.getRenderedWaveAsStream(waveWidth, waveHeigth), 0,0);
-            asyncAdd(artwork_view, artwork.getLargeAsStream(), artWidth, artHeigth);
 
-            artwork_view.setOnMouseClicked(mouseEvent -> setTrack(track));
-            wave_view.setOnMouseClicked(mouseEvent -> setTrack(track));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        asyncArtworkAdd(artwork_view, artwork, artWidth, artHeigth);
+
+        artwork_view.setOnMouseClicked(mouseEvent -> setTrack(track));
+        wave_view.setOnMouseClicked(mouseEvent -> setTrack(track));
 
         box.setLeft(artwork_view);
         VBox wave_con = new VBox();
@@ -91,6 +88,9 @@ public class FavoriteScene {
 
     private void playNextTrack(Track track) {
         int current = favList.indexOf(track);
+        if (current == favList.size()) {
+            loadNextFav();
+        }
         setTrack(favList.get(++current));
     }
 
@@ -103,27 +103,30 @@ public class FavoriteScene {
             controller.getProgressSlider().setMax(track.getDuration() / 1000);
             AudioManager.getPlayerFx().setMediaEndListener(() -> playNextTrack(track));
             AudioManager.getPlayerFx().setProgressTimeListener((observable, oldValue, newValue) ->
-            controller.getProgressSlider().setValue(observable.getValue().toSeconds()));
+            {
+                controller.getProgressSlider().setValue(newValue.toSeconds());
+                track.getWaveform().progressAnimation(newValue.toSeconds()/(track.getDuration()/1000));
+            });
+        } catch (CloudAPI.ResolverException re) {
+            re.printStackTrace();
+            playNextTrack(track);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void asyncAdd(ImageView view, InputStream image, int width, int heigth) {
+    private void asyncArtworkAdd(ImageView view, ArtWork artWork, int width, int heigth) {
         BackgroundLoader.addTask(() ->
         {
-            Image img = new Image(image);
-            if (width != 0 && heigth != 0 && img.getWidth() != width && img.getHeight() != heigth && image.markSupported())
-            {
-                try {
-                    //FIXME stream reset is not supported
-                    image.reset();
-                    img = new Image(image, width, heigth, true, true);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                Image img = new Image(artWork.getLargeAsStream());
+                if (width != 0 && heigth != 0 && img.getWidth() != width && img.getHeight() != heigth) {
+                    img = new Image(artWork.getLargeAsStream(), width, heigth, true, true);
                 }
+                view.setImage(img);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            view.setImage(img);
         });
     }
 }

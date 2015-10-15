@@ -58,7 +58,7 @@ public class Player extends Application {
         InputStream is;
         try {
             is = new FileInputStream(new File("wave.png"));
-            Image image = WaveRenderer.renderWaveFx(is, 100, 800);
+            Image image = WaveRenderer.init(is, 100, 800).renderWaveFx();
             StackPane root = new StackPane();
             ImageView imageView = new ImageView(image);
             root.getChildren().add(imageView);

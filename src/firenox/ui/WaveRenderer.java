@@ -1,10 +1,14 @@
 package firenox.ui;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
+import javafx.scene.paint.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,39 +19,58 @@ import java.io.InputStream;
  */
 public class WaveRenderer {
 
-    static int stripWidth = 2;
-    static int spacing = 1;
-    static BufferedImage original;
-    static int oldWidth;
-    static int oldHeight;
-    static int newWidth;
-    static int newHeight;
+    private final static int stripWidth = 2;
+    private final static int spacing = 1;
 
-    public static BufferedImage renderWave(InputStream is, int width, int height) throws IOException {
-        BufferedImage image = ImageIO.read(is);
-        original = image;
-        oldHeight = image.getHeight();
-        oldWidth = image.getWidth();
-        newHeight = height;
-        newWidth = width;
-        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    private int stripNr;
+    private BufferedImage original;
+    private int oldWidth;
+    private int oldHeight;
+    private double newWidth;
+    private double newHeight;
+    private Canvas canvasRender;
+
+    public WaveRenderer(InputStream is, int width, int height)
+    {
+        try {
+            BufferedImage image = ImageIO.read(is);
+            original = image;
+            oldHeight = image.getHeight();
+            oldWidth = image.getWidth();
+            newHeight = height;
+            newWidth = width;
+
+            stripNr = (int) (newWidth / (spacing + stripWidth));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static WaveRenderer init(InputStream is, int width, int height) throws IOException {
+        return new WaveRenderer(is, width, height);
+    }
+
+    public BufferedImage renderWave() {
+        BufferedImage result = new BufferedImage((int) newWidth, (int) newHeight, BufferedImage.TYPE_INT_ARGB);
         render(result);
 
         return result;
     }
 
-    public static WritableImage renderWaveFx(InputStream is, int width, int height) throws IOException {
-        return SwingFXUtils.toFXImage(renderWave(is, width, height), null);
+
+
+    public WritableImage renderWaveFx() {
+        return SwingFXUtils.toFXImage(renderWave(), null);
     }
 
-    public static File renderWaveToFile(InputStream is, int width, int height, String path) throws IOException {
-        BufferedImage bufferedImage = renderWave(is, width, height);
+    public File renderWaveToFile(String path) throws IOException {
+        BufferedImage bufferedImage = renderWave();
         File file = new File(path);
         ImageIO.write(bufferedImage, "png", file);
         return file;
     }
 
-    private static int getFirstNonOpaquePixel(int x) {
+    private int getFirstNonOpaquePixel(int x) {
         double yinc = oldHeight / newHeight / 2;
         double xinc = oldWidth / newWidth;
         double yc = 0;
@@ -63,8 +86,7 @@ public class WaveRenderer {
         return y;
     }
 
-    private static void render(BufferedImage image) {
-        int stripNr = newWidth / (spacing + stripWidth);
+    private void render(BufferedImage image) {
 
         Graphics g = image.getGraphics();
         g.setColor(new Color(0xA1A1A1));
@@ -72,7 +94,41 @@ public class WaveRenderer {
         for (int i = 1; i <= stripNr; i++) {
             int x = spacing * i + (stripWidth * i - 1);
             int y = getFirstNonOpaquePixel(x);
-            g.fillRect(x, y, stripWidth, newHeight);
+            g.fillRect(x, y, stripWidth, (int) newHeight);
+        }
+    }
+
+    public Canvas renderToFxCanvas() {
+        Canvas canvas = new Canvas(newWidth, newHeight);
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        for (int i = 1; i <= stripNr; i++) {
+            double x = spacing * i + (stripWidth * i - 1);
+            double y = getFirstNonOpaquePixel((int) x);
+            gc.setFill(javafx.scene.paint.Color.LIGHTGRAY);
+            gc.fillRect(x, y, stripWidth, newHeight * 0.7 - y);
+
+            gc.setFill(javafx.scene.paint.Color.GRAY);
+            gc.fillRect(x, newHeight * 0.7 + 1, stripWidth, (newHeight * 0.3) - (y * 0.3));
+        }
+
+        canvasRender = canvas;
+        return canvas;
+    }
+
+    public void renderProgress(double progress) {
+
+        GraphicsContext gc = canvasRender.getGraphicsContext2D();
+
+        for (int i = 1; i <= stripNr*progress; i++) {
+            double x = spacing * i + (stripWidth * i - 1);
+            double y = getFirstNonOpaquePixel((int) x);
+            gc.setFill(javafx.scene.paint.Color.LIGHTCORAL.brighter().brighter());
+            gc.fillRect(x, y, stripWidth, newHeight * 0.7 - y);
+
+            gc.setFill(javafx.scene.paint.Color.CORAL);
+            gc.fillRect(x, newHeight * 0.7 + 1, stripWidth, (newHeight * 0.3) - (y * 0.3));
         }
     }
 }

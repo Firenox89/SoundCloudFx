@@ -1,6 +1,7 @@
 package firenox.media;
 
 import firenox.logger.Logger;
+import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -15,6 +16,8 @@ public class AudioPlayerFx implements IAudioPlayer {
     Media currentMedia;
     MediaPlayer player;
     private boolean isPlaying = false;
+    private double volume = 0.2;
+    private Property<Number> volumeSliderProb;
 
     AudioPlayerFx() {
     }
@@ -63,6 +66,7 @@ public class AudioPlayerFx implements IAudioPlayer {
         stop();
 
         player = new MediaPlayer(currentMedia);
+        player.volumeProperty().bindBidirectional(volumeSliderProb);
         player.play();
         isPlaying = true;
     }
@@ -73,8 +77,17 @@ public class AudioPlayerFx implements IAudioPlayer {
         if (player != null) {
             player.setVolume(volume);
         }
+        this.volume = volume;
     }
 
+    public void bindVolume(Property<Number> volumeProb)
+    {
+        if (player != null) {
+            player.volumeProperty().bindBidirectional(volumeProb);
+        }
+        volumeSliderProb = volumeProb;
+
+    }
     @Override
     public void next() {
         log.d("next");
@@ -121,6 +134,10 @@ public class AudioPlayerFx implements IAudioPlayer {
 
     public void setProgressTimeListener(ChangeListener<Duration> listener) {
         player.currentTimeProperty().addListener(listener);
+    }
+
+    public void seek()
+    {
     }
 
 }
