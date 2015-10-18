@@ -1,20 +1,18 @@
 package firenox.ui;
 
 import firenox.media.AudioManager;
-import firenox.model.ModelManager;
 import firenox.model.Track;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by firenox on 10/6/15.
@@ -68,4 +66,20 @@ public class UIManager {
 
 //        ModelManager.getPlaylists();
     }
+
+    public static void setTrackForPlayerUI(Track track) {
+        try {
+            controller.getArtWork().setImage(new Image(track.getArtwork().getLargeAsStream(), 40, 40, true, true));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        controller.getTitleLabel().setText(track.getTitle());
+        controller.getProgressSlider().setMax(track.getDuration() / 1000);
+        AudioManager.getPlayerFx().setProgressTimeListener((observable, oldValue, newValue) ->
+        {
+            controller.getProgressSlider().setValue(newValue.toSeconds());
+            track.getWaveform().progressAnimation(newValue.toSeconds() / (track.getDuration() / 1000));
+        });
+    }
+
 }

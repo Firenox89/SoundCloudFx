@@ -1,5 +1,7 @@
 package firenox.media;
 
+import firenox.model.Track;
+
 /**
  * Created by firenox on 10/7/15.
  */
@@ -10,7 +12,7 @@ interface IAudioPlayer {
 
     void stop();
 
-    void open(String url);
+    void open(Track track);
 
     void setVolume(double volume);
 

@@ -1,6 +1,5 @@
 package firenox.ui;
 
-import com.soundcloud.api.CloudAPI;
 import firenox.io.BackgroundLoader;
 import firenox.media.AudioManager;
 import firenox.model.ArtWork;
@@ -40,15 +39,14 @@ public class FavoriteScene {
         scrollPane.setContent(vbox);
         favList = ModelManager.getLikes();
         setFavorites(favList);
+        AudioManager.getPlayerFx().setExtendPlaylistHandler(this::loadNextFav);
 
-        AudioManager.getPlayerFx().setNextHandler(() -> playNextTrack());
-        AudioManager.getPlayerFx().setPreviousHandler(() -> playPreviousTrack());
     }
 
     public void setFavorites(ArrayList<Track> favList) {
         favList.forEach(t -> vbox.getChildren().add(buildTrackContainer(t)));
 
-        //if viewport reaches the bottom, fetch and a new tracks
+        //if viewport reaches the bottom, fetch and add new tracks
         scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.doubleValue() > 0.98) {
                 loadNextFav();
@@ -89,41 +87,10 @@ public class FavoriteScene {
         return box;
     }
 
-    public void playNextTrack() {
-        int current = favList.indexOf(currentTrack);
-        if (current == favList.size()) {
-            loadNextFav();
-        }
-        setTrack(favList.get(++current));
-    }
-
-    public void playPreviousTrack() {
-        int current = favList.indexOf(currentTrack);
-        if (current > 1) {
-            setTrack(favList.get(--current));
-        }
-    }
 
     private void setTrack(Track track) {
-        try {
-//            AudioManager.getPlayerFx().open(track.getTempFileURL());
-            currentTrack = track;
-            AudioManager.getPlayerFx().open(track.getStreamURL());
-            controller.getArtWork().setImage(new Image(track.getArtwork().getLargeAsStream(), 40, 40, true, true));
-            controller.getTitleLabel().setText(track.getTitle());
-            controller.getProgressSlider().setMax(track.getDuration() / 1000);
-            AudioManager.getPlayerFx().setMediaEndListener(() -> playNextTrack());
-            AudioManager.getPlayerFx().setProgressTimeListener((observable, oldValue, newValue) ->
-            {
-                controller.getProgressSlider().setValue(newValue.toSeconds());
-                track.getWaveform().progressAnimation(newValue.toSeconds()/(track.getDuration()/1000));
-            });
-        } catch (CloudAPI.ResolverException re) {
-            re.printStackTrace();
-            playNextTrack();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        currentTrack = track;
+        AudioManager.getPlayerFx().open(favList, favList.indexOf(track));
     }
 
     private void asyncArtworkAdd(ImageView view, ArtWork artWork, int width, int heigth) {

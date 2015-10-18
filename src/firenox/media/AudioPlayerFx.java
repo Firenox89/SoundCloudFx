@@ -1,11 +1,15 @@
 package firenox.media;
 
 import firenox.logger.Logger;
+import firenox.model.Track;
+import firenox.ui.UIManager;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+
+import java.util.ArrayList;
 
 /**
  * Created by firenox on 10/6/15.
@@ -16,21 +20,18 @@ public class AudioPlayerFx implements IAudioPlayer {
     Media currentMedia;
     MediaPlayer player;
     private boolean isPlaying = false;
-    private double volume = 0.2;
+    private double defaultVolume = 0.2;
     private Property<Number> volumeSliderProb;
     private Runnable nextHandler;
     private Runnable previousHandler;
+    private Runnable extendPlaylistHandler;
+    private ArrayList<Track> currentPlaylist;
+    private boolean repeat = false;
+    private boolean shuffle = false;
+    private Track currentTrack;
+
 
     AudioPlayerFx() {
-    }
-
-    AudioPlayerFx(String url) {
-        currentMedia = new Media(url);
-        player = new MediaPlayer(currentMedia);
-
-        player.setVolume(new Double(1));
-        player.play();
-        isPlaying = true;
     }
 
     @Override
@@ -61,49 +62,80 @@ public class AudioPlayerFx implements IAudioPlayer {
         }
     }
 
-    @Override
-    public void open(String url) {
+    public void open(Track track) {
+        currentTrack = track;
+        String url = track.getStreamURL();
+
         log.d("open: " + url);
         currentMedia = new Media(url);
         stop();
 
         player = new MediaPlayer(currentMedia);
+
         player.volumeProperty().bindBidirectional(volumeSliderProb);
+        volumeSliderProb.setValue(defaultVolume);
+        player.setOnEndOfMedia(this::next);
+        //TODO: append listener to new player
+
         player.play();
         isPlaying = true;
+
+        UIManager.setTrackForPlayerUI(currentTrack);
+    }
+
+    public void open(ArrayList<Track> playlist, int startIndex) {
+        currentPlaylist = playlist;
+        open(currentPlaylist.get(startIndex));
     }
 
     @Override
     public void setVolume(double volume) {
         log.d("volume = " + volume);
-        if (player != null) {
-            player.setVolume(volume);
-        }
-        this.volume = volume;
+        volumeSliderProb.setValue(volume);
     }
 
-    public void bindVolume(Property<Number> volumeProb)
-    {
+    public void bindVolume(Property<Number> volumeProb) {
         if (player != null) {
             player.volumeProperty().bindBidirectional(volumeProb);
         }
         volumeSliderProb = volumeProb;
 
     }
+
     @Override
     public void next() {
         log.d("next");
         if (nextHandler != null) {
             nextHandler.run();
+        } else if (currentPlaylist != null && currentTrack != null) {
+            if (shuffle) {
+                open(currentPlaylist.get((int) (Math.random() * currentPlaylist.size())));
+            } else {
+                int current = currentPlaylist.indexOf(currentTrack);
+                if (current == currentPlaylist.size()) {
+                    extendPlaylistHandler.run();
+                }
+                //FIXME: extending fails handling
+                if (repeat) {
+                    open(currentPlaylist.get(current));
+                } else {
+                    open(currentPlaylist.get(++current));
+                }
+            }
         }
     }
+
 
     @Override
     public void previous() {
         log.d("previous");
-        if (previousHandler != null)
-        {
+        if (previousHandler != null) {
             previousHandler.run();
+        } else if (currentPlaylist != null && currentTrack != null) {
+            int current = currentPlaylist.indexOf(currentTrack);
+            if (current > 1) {
+                open(currentPlaylist.get(--current));
+            }
         }
     }
 
@@ -141,18 +173,20 @@ public class AudioPlayerFx implements IAudioPlayer {
         player.currentTimeProperty().addListener(listener);
     }
 
-    public void setNextHandler(Runnable next)
-    {
-        nextHandler = next;
+    public void setNextHandler(Runnable handler) {
+        nextHandler = handler;
     }
 
-    public void setPreviousHandler(Runnable previous)
-    {
-        previousHandler = previous;
+    public void setPreviousHandler(Runnable handler) {
+        previousHandler = handler;
     }
 
-    public void seek()
-    {
+    public void setExtendPlaylistHandler(Runnable handler) {
+        extendPlaylistHandler = handler;
     }
+
+    public void seek() {
+    }
+
 
 }
