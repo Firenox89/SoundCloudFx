@@ -2,95 +2,26 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.8
 version = '0.0.1'
 group   = 'firenox'
 
-repositories   { mavenCentral() }
-
 sourceSets {
-  examples {
-    compileClasspath = sourceSets.main.output + sourceSets.main.runtimeClasspath
+  main {
+    java {
+      srcDir 'src'
+    }
+    resources {
+      srcDir 'res'
+    }
   }
 }
+
+repositories   { mavenCentral() }
 
 dependencies {
   compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.0.3'
   compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.0.3'
   compile group: 'org.json', name: 'json', version: '20090211'
-
-  testCompile group: 'junit', name: 'junit-dep', version: '4.11'
-  testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3.RC2'
-  testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3.RC2'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '1.8.5'
+  compile group: 'com.soundcloud', name: 'java-api-wrapper', version: '1.3.1'
 }
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-     snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots',
-                        id:  'sonatype-nexus-snapshots') {
-        authentication(getAuth('sonatype-nexus-snapshots'))
-     }
-     repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/',
-                id:  'sonatype-nexus-staging') {
-        authentication(getAuth('sonatype-nexus-staging'))
-     }
-     pom {
-       project {
-         name        'SoundCloudFx'
-         description 'JavaFx based Soundcloud Player'
-         url 'https://github.com/firenox89/soundcloudfx#readme'
-         inceptionYear '2011'
-       }
-       withXml { xml ->
-          new XmlParser().parse(new File("pom-include.xml")).children().each { kid -> xml.asNode().append(kid) }
-        }
-      }
-    }
-  }
-}
-
-[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all']
-
-ext.httpDebug = ['org.apache.commons.logging.Log': 'org.apache.commons.logging.impl.SimpleLog',
-             'org.apache.commons.logging.simplelog.showdatetime': 'true',
-             'org.apache.commons.logging.simplelog.log.org.apache.http': 'DEBUG',
-             'org.apache.commons.logging.simplelog.log.org.apache.http.wire': 'ERROR']
-
-
-task writePom << {
-  uploadArchives.repositories.mavenDeployer().getPom().writeTo("pom.xml")
-}
-
-task doc(type: Javadoc) {
-  source = sourceSets.main.allJava
-  title = "SoundCloud Java API Wrapper $version"
-  classpath = sourceSets.main.compileClasspath
-  destinationDir = new File(new File(buildDir, 'javadoc'), version)
-  options.version = true
-  options.links = [
-    "http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/",
-    "http://json.org/javadoc/"
-  ]
-  //options.stylesheetFile = new File('styles.css')
-}
-
-task jarAll(type: Jar) {
-  description = "Build a jar file with all dependencies"
-  dependsOn configurations.runtime, sourceSets.main.output, sourceSets.examples.output
-  archiveName = project.name + "-" + version +"-all.jar"
-  from { (configurations.runtime + sourceSets.main.output + sourceSets.examples.output ).collect {
-    it.isDirectory() ? it : zipTree(it) }
-  }
-}
-
-def getAuth(repo_id) {
-  def m2_settings = new File("${System.getProperty('user.home')}/.m2/settings.xml")
-  if (m2_settings.exists()) {
-    def settings = new XmlSlurper().parse(m2_settings)
-    def repo = settings.servers.server.find { it.id.text() == repo_id }
-    if (repo != null) return [userName: repo.username.text(), password: repo.password.text()]
-   }
-   [:]
-}
