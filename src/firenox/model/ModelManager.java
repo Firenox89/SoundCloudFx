@@ -45,8 +45,6 @@ public class ModelManager {
     private ModelManager() {
     }
 
-    ;
-
     public static User getUser(String name) {
         User user = userList.get(name);
 
@@ -55,6 +53,11 @@ public class ModelManager {
             userList.put(name, user);
         }
         return user;
+    }
+
+    public static User getMe()
+    {
+        return getUser(Endpoints.MY_DETAILS);
     }
 
     public static Track getTrack(String name) {
@@ -69,21 +72,9 @@ public class ModelManager {
         return track;
     }
 
-    public static ArrayList<Track> getLikes() {
-        return getUser(Endpoints.MY_DETAILS).getFavList();
+    public static PagedList<Track> getLikes() {
+        return getMe().getFavList();
     }
-
-    /**
-     * Add next page to the FavList.
-     *
-     * @return true if there are more to load.
-     */
-    public static ArrayList<Track> loadNextFav()
-    {
-        return getUser(Endpoints.MY_DETAILS).loadNextTracks();
-    }
-
-
 
     public static void getPlaylists() {
         try {

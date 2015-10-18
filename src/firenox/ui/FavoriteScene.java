@@ -2,10 +2,7 @@ package firenox.ui;
 
 import firenox.io.BackgroundLoader;
 import firenox.media.AudioManager;
-import firenox.model.ArtWork;
-import firenox.model.ModelManager;
-import firenox.model.Track;
-import firenox.model.WaveForm;
+import firenox.model.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -29,7 +26,7 @@ public class FavoriteScene {
     private final ScrollPane scrollPane;
     private VBox vbox;
     private FXMLController controller;
-    private ArrayList<Track> favList;
+    private PagedList<Track> favList;
     private Track currentTrack;
 
     public FavoriteScene() {
@@ -38,29 +35,23 @@ public class FavoriteScene {
         scrollPane = controller.getMainScrollPane();
         scrollPane.setContent(vbox);
         favList = ModelManager.getLikes();
-        setFavorites(favList);
-        AudioManager.getPlayerFx().setExtendPlaylistHandler(this::loadNextFav);
-
+        setFavorites();
     }
 
-    public void setFavorites(ArrayList<Track> favList) {
+    public void setFavorites() {
         favList.forEach(t -> vbox.getChildren().add(buildTrackContainer(t)));
 
-        //if viewport reaches the bottom, fetch and add new tracks
-        scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() > 0.98) {
-                loadNextFav();
-            }
-        });
-    }
+        //update container on list changes
+        favList.setNewEntriesLoadedListener(() ->
+                favList.getLastLoadedEntries().forEach(t -> vbox.getChildren().add(buildTrackContainer(t))));
 
-    private void loadNextFav() {
-        ArrayList<Track> newTracks = ModelManager.loadNextFav();
-        if (newTracks != null) {
-            newTracks.forEach(t -> vbox.getChildren().add(buildTrackContainer(t)));
-        }
+        //if viewport reaches the bottom, request new tracks
+                scrollPane.vvalueProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue.doubleValue() > 0.98) {
+                        favList.loadNextEntries();
+                    }
+                });
     }
-
 
     private BorderPane buildTrackContainer(Track track) {
         BorderPane box = new BorderPane();

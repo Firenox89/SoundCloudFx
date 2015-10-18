@@ -1,6 +1,7 @@
 package firenox.media;
 
 import firenox.logger.Logger;
+import firenox.model.PagedList;
 import firenox.model.Track;
 import firenox.ui.UIManager;
 import javafx.beans.property.Property;
@@ -24,8 +25,7 @@ public class AudioPlayerFx implements IAudioPlayer {
     private Property<Number> volumeSliderProb;
     private Runnable nextHandler;
     private Runnable previousHandler;
-    private Runnable extendPlaylistHandler;
-    private ArrayList<Track> currentPlaylist;
+    private PagedList<Track> currentPlaylist;
     private boolean repeat = false;
     private boolean shuffle = false;
     private Track currentTrack;
@@ -83,7 +83,7 @@ public class AudioPlayerFx implements IAudioPlayer {
         UIManager.setTrackForPlayerUI(currentTrack);
     }
 
-    public void open(ArrayList<Track> playlist, int startIndex) {
+    public void open(PagedList<Track> playlist, int startIndex) {
         currentPlaylist = playlist;
         open(currentPlaylist.get(startIndex));
     }
@@ -112,10 +112,6 @@ public class AudioPlayerFx implements IAudioPlayer {
                 open(currentPlaylist.get((int) (Math.random() * currentPlaylist.size())));
             } else {
                 int current = currentPlaylist.indexOf(currentTrack);
-                if (current == currentPlaylist.size()) {
-                    extendPlaylistHandler.run();
-                }
-                //FIXME: extending fails handling
                 if (repeat) {
                     open(currentPlaylist.get(current));
                 } else {
@@ -179,10 +175,6 @@ public class AudioPlayerFx implements IAudioPlayer {
 
     public void setPreviousHandler(Runnable handler) {
         previousHandler = handler;
-    }
-
-    public void setExtendPlaylistHandler(Runnable handler) {
-        extendPlaylistHandler = handler;
     }
 
     public void seek() {

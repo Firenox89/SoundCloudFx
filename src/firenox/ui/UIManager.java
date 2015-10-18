@@ -31,7 +31,7 @@ public class UIManager {
 
     public static void init(Stage stage) {
         instance = new UIManager(stage);
-        FXMLLoader loader = new FXMLLoader(UIManager.class.getResource("favorites.fxml"));
+        FXMLLoader loader = new FXMLLoader(UIManager.class.getClassLoader().getResource("favorites.fxml"));
 
         try {
             root = loader.load();
