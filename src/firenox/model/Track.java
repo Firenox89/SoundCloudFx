@@ -29,6 +29,7 @@ public class Track {
     int duration;
     WaveForm waveform;
     private JSONObject jsonObject;
+    private User user;
 
     public Track(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
@@ -43,10 +44,18 @@ public class Track {
             title = jsonObject.getString("title");
             uri = jsonObject.getString("uri");
             permalink_url = jsonObject.getString("permalink_url");
-            artwork = new ArtWork(jsonObject.getString("artwork_url"));
             stream_url = jsonObject.getString("stream_url");
             duration = jsonObject.getInt("duration");
             waveform = new WaveForm(jsonObject.getString("waveform_url"));
+            String artwork_url = jsonObject.getString("artwork_url");
+            System.out.println("artwork_url = " + artwork_url);
+            //in case the artwork is null use the user avatar
+            if (artwork_url.equals("null"))
+            {
+                artwork_url = jsonObject.getJSONObject("user").getString("avatar_url");
+            }
+            artwork = new ArtWork(artwork_url);
+
             log.i("title " + title);
             log.i("id " + id);
             log.i("user_id " + user_id);

@@ -4,6 +4,8 @@ import firenox.io.LogInHandler;
 import firenox.logger.Logger;
 import firenox.statistics.Traffic;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
@@ -42,12 +44,17 @@ public abstract class CacheableImage {
         }
         FileOutputStream fos = new FileOutputStream(fileToCache);
 
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = is.read(buffer)) != -1) {
-            fos.write(buffer);
-            Traffic.addImageTraffic(read);
-        }
+        //read in image to check for image corruption
+        BufferedImage bi = ImageIO.read(is);
+
+        ImageIO.write(bi, "png", fileToCache);
+
+//        byte[] buffer = new byte[1024];
+//        int read;
+//        while ((read = is.read(buffer)) != -1) {
+//            fos.write(buffer);
+//            Traffic.addImageTraffic(read);
+//        }
 
         return fileToCache;
     }

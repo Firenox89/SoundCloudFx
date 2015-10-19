@@ -1,6 +1,3 @@
-Build
-    Fix gradle file to actually build this thing (just used for dependency fetching at the moment)
-
 UI
     Menu...
     Search bar
@@ -20,14 +17,9 @@ UI
 Logic
     UI corresponding things
     Rename & Refactor LogInHandler
-    Playlists handling (in player or somewhere else)
-    Next Previous Button logic
     Models for playlist
     Follower/Following
     Serialization of tracks, user...
-
-Misc
-    check artwork/wave, they sometimes get corrupted
 
 JavaDoc
     EVERYWHERE
