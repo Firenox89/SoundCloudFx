@@ -18,6 +18,8 @@ public class FXMLController {
     @FXML private Button volumeBtn;
     @FXML private ContextMenu volumeContext;
     @FXML private ScrollPane mainScrollPane;
+    @FXML private Label trackTime;
+    @FXML private Label playbackTime;
 
     @FXML protected void handlePrevButton(ActionEvent event) {
         AudioManager.getPlayerFx().previous();
@@ -29,6 +31,19 @@ public class FXMLController {
 
     @FXML protected void handleNextPlayButton(ActionEvent event) {
         AudioManager.getPlayerFx().next();
+    }
+
+
+    @FXML protected void handleVolumeButton(ActionEvent actionEvent) {
+        volumeBtn.setContextMenu(volumeContext);
+    }
+
+    @FXML public void handlePlaylistButton(ActionEvent actionEvent) {
+        UIManager.showPlaylists();
+    }
+
+    @FXML public void handleLikesButton(ActionEvent actionEvent) {
+        UIManager.showFavorites();
     }
 
 
@@ -52,16 +67,11 @@ public class FXMLController {
         return mainScrollPane;
     }
 
-    @FXML
-    protected void handleVolumeButton(ActionEvent actionEvent) {
-        volumeBtn.setContextMenu(volumeContext);
+    public Label getTrackTime() {
+        return trackTime;
     }
 
-    public void handlePlaylistButton(ActionEvent actionEvent) {
-        UIManager.showPlaylists();
-    }
-
-    public void handleLikesButton(ActionEvent actionEvent) {
-        UIManager.showFavorites();
+    public Label getPlaybackTime() {
+        return playbackTime;
     }
 }

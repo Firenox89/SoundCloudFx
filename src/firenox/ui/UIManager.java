@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 /**
  * Created by firenox on 10/6/15.
@@ -73,11 +74,20 @@ public class UIManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //duration in seconds
+        int duration = track.getDuration()/1000;
+        DecimalFormat secondFormater = new DecimalFormat("00");
+
         controller.getTitleLabel().setText(track.getTitle());
-        controller.getProgressSlider().setMax(track.getDuration() / 1000);
+        controller.getProgressSlider().setMax(duration);
+
+        controller.getTrackTime().setText((duration/60) + ":" + secondFormater.format(duration%60));
+
         AudioManager.getPlayerFx().setProgressTimeListener((observable, oldValue, newValue) ->
         {
-            controller.getProgressSlider().setValue(newValue.toSeconds());
+            int seconds = (int) newValue.toSeconds();
+            controller.getProgressSlider().setValue(seconds);
+            controller.getPlaybackTime().setText((seconds/60) + ":" + secondFormater.format(seconds%60));
             track.getWaveform().progressAnimation(newValue.toSeconds() / (track.getDuration() / 1000));
         });
     }

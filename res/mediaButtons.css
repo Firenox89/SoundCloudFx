@@ -32,3 +32,9 @@
 #titleLabel {
     -fx-text-fill: #E9E9E9;
 }
+#playbackTime {
+    -fx-text-fill: #E9E9E9;
+}
+#trackTime {
+    -fx-text-fill: #E9E9E9;
+}
