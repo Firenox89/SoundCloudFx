@@ -1,9 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'application'
 
 version = '0.0.1'
 group   = 'firenox'
+mainClassName = "firenox.Player"
 
 sourceSets {
   main {

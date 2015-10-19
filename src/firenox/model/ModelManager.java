@@ -32,7 +32,7 @@ public class ModelManager {
 
     static {
         try {
-            properties.load(new FileInputStream(new File("app.properties")));
+            properties.load(ModelManager.class.getClassLoader().getResourceAsStream("app.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }

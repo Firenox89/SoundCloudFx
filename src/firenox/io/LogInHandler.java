@@ -26,7 +26,7 @@ public class LogInHandler {
     private static Properties credentials = new Properties();
     static {
         try {
-            credentials.load(new FileInputStream(new File("credentials.properties")));
+            credentials.load(LogInHandler.class.getClassLoader().getResourceAsStream("credentials.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -153,6 +153,15 @@ public class LogInHandler {
     }
 
     public ApiWrapper serialises(String login, String pass) {
+        if (CLIENT_ID == null || CLIENT_ID.equals(""))
+            throw new IllegalStateException("Client_Id is empty.");
+        if (CLIENT_SECRET == null || CLIENT_SECRET.equals(""))
+            throw new IllegalStateException("Client_Id is empty.");
+        if (login == null || login.equals(""))
+            throw new IllegalStateException("Client_Id is empty.");
+        if (pass == null || pass.equals(""))
+            throw new IllegalStateException("Client_Id is empty.");
+
         final ApiWrapper wrapper = new ApiWrapper(
                 CLIENT_ID /* client_id */,
                 CLIENT_SECRET /* client_secret */,
@@ -162,17 +171,13 @@ public class LogInHandler {
         Token token = null;
         try {
             token = wrapper.login(login /* login */, pass /* password */);
+            wrapper.toFile(WRAPPER_SER);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         System.out.println("got token from server: " + token);
 
-        try {
-            wrapper.toFile(WRAPPER_SER);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return wrapper;
     }
 }
