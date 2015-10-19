@@ -38,6 +38,12 @@ public class Track {
 
     private void parseJSON(JSONObject jsonObject) {
         try {
+
+            if (jsonObject.has("origin"))
+            {
+                long id = jsonObject.getJSONObject("origin").getLong("id");
+                jsonObject = LogInHandler.getJSON("/tracks/"+id);
+            }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
             permalink = jsonObject.getString("permalink");
@@ -48,7 +54,6 @@ public class Track {
             duration = jsonObject.getInt("duration");
             waveform = new WaveForm(jsonObject.getString("waveform_url"));
             String artwork_url = jsonObject.getString("artwork_url");
-            System.out.println("artwork_url = " + artwork_url);
             //in case the artwork is null use the user avatar
             if (artwork_url.equals("null"))
             {

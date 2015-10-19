@@ -7,10 +7,8 @@ import firenox.logger.Logger;
 import org.apache.http.HttpResponse;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -55,8 +53,7 @@ public class ModelManager {
         return user;
     }
 
-    public static User getMe()
-    {
+    public static User getMe() {
         return getUser(Endpoints.MY_DETAILS);
     }
 
@@ -73,7 +70,7 @@ public class ModelManager {
     }
 
     public static PagedList<Track> getLikes() {
-        return getMe().getFavList();
+        return getMe().getLikesList();
     }
 
     public static void getPlaylists() {
@@ -99,5 +96,9 @@ public class ModelManager {
 
     public Track loadTrack(String name) {
         return new Track(LogInHandler.getJSON(name));
+    }
+
+    public static PagedList<Track> getStream() {
+        return getMe().getStream();
     }
 }

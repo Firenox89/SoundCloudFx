@@ -1,33 +1,30 @@
 package firenox.model;
 
 import com.soundcloud.api.Endpoints;
-import firenox.io.Http;
-import firenox.io.LogInHandler;
 import firenox.logger.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * Created by firenox on 10/6/15.
  */
 public class User {
-    Logger log = Logger.getLogger(getClass().getName());
-    int id;
-    String permalink;
-    String username;
-    String uri;
-    String permalink_url;
-    String avatar_url;
-    PagedList<Track> favList;
+    private Logger log = Logger.getLogger(getClass().getName());
+    private int id;
+    private String permalink;
+    private String username;
+    private String uri;
+    private String permalink_url;
+    private String avatar_url;
+    private PagedList<Track> likesList;
     private int LIMIT = 10;
+    private PagedList<Track> streamList;
 
     public User(JSONObject jsonObject) {
         parseJSON(jsonObject);
 
-        favList = new PagedList<>(Endpoints.MY_FAVORITES, LIMIT, Track.class);
+        likesList = new PagedList<>(Endpoints.MY_FAVORITES, LIMIT, Track.class);
+        streamList = new PagedList<>(Endpoints.MY_ACTIVITIES, LIMIT, Track.class);
     }
 
     private void parseJSON(JSONObject jsonObject) {
@@ -50,8 +47,8 @@ public class User {
         }
     }
 
-    public PagedList<Track> getFavList() {
-        return favList;
+    public PagedList<Track> getLikesList() {
+        return likesList;
     }
 
     public int getId() {
@@ -76,5 +73,9 @@ public class User {
 
     public String getAvatar_url() {
         return avatar_url;
+    }
+
+    public PagedList<Track> getStream() {
+        return streamList;
     }
 }

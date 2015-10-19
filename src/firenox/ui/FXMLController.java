@@ -46,6 +46,17 @@ public class FXMLController {
         UIManager.showFavorites();
     }
 
+    @FXML public void handlePlayerButton(ActionEvent actionEvent) {
+        UIManager.showPlayer();
+    }
+
+    @FXML public void handleStreamButton(ActionEvent actionEvent) {
+        UIManager.showStream();
+    }
+
+    @FXML public void handleProfileButton(ActionEvent actionEvent) {
+        UIManager.showProfile();
+    }
 
     public Label getTitleLabel() {
         return titleLabel;
@@ -74,4 +85,5 @@ public class FXMLController {
     public Label getPlaybackTime() {
         return playbackTime;
     }
+
 }

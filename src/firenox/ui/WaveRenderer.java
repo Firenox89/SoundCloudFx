@@ -1,5 +1,6 @@
 package firenox.ui;
 
+import firenox.logger.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -29,6 +30,7 @@ public class WaveRenderer {
     private double newWidth;
     private double newHeight;
     private Canvas canvasRender;
+    private Logger log = Logger.getLogger(getClass().getName());
 
     public WaveRenderer(InputStream is, int width, int height)
     {
