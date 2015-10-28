@@ -80,7 +80,7 @@ public class AudioPlayerFx implements IAudioPlayer {
         player.play();
         isPlaying = true;
 
-        UIManager.setTrackForPlayerUI(currentTrack);
+        UIManager.setTrackForPlayerUI(currentTrack, currentPlaylist);
     }
 
     public void open(PagedList<Track> playlist, int startIndex) {

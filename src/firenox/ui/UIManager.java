@@ -1,6 +1,7 @@
 package firenox.ui;
 
 import firenox.media.AudioManager;
+import firenox.model.PagedList;
 import firenox.model.Track;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,6 +25,9 @@ public class UIManager {
     private static Parent root;
     private static LikesPane likesPane;
     private static StreamPane streamPane;
+    private static PlayerPane playerPane;
+    private static Track currenTrack;
+    private static PagedList<Track> currentPlaylist;
 
     public static void init(Stage stage) {
         FXMLLoader loader = new FXMLLoader(UIManager.class.getClassLoader().getResource("favorites.fxml"));
@@ -68,6 +72,11 @@ public class UIManager {
     }
 
     public static void showPlayer() {
+        if (playerPane == null)
+        {
+            playerPane = new PlayerPane();
+        }
+        getController().getMainScrollPane().setContent(playerPane);
     }
 
     public static void showStream() {
@@ -81,7 +90,9 @@ public class UIManager {
     public static void showProfile() {
     }
 
-    public static void setTrackForPlayerUI(Track track) {
+    public static void setTrackForPlayerUI(Track track, PagedList<Track> playlist) {
+        currenTrack = track;
+        currentPlaylist = playlist;
         try {
             controller.getArtWork().setImage(new Image(track.getArtwork().getLargeAsStream(), 40, 40, true, true));
         } catch (IOException e) {
@@ -103,5 +114,13 @@ public class UIManager {
             controller.getPlaybackTime().setText((seconds/60) + ":" + secondFormater.format(seconds % 60));
             track.getWaveform().progressAnimation(newValue.toSeconds() / (track.getDuration() / 1000));
         });
+    }
+
+    public static Track getCurrentTrack() {
+        return currenTrack;
+    }
+
+    public static PagedList<Track> getCurrentPlaylist() {
+        return currentPlaylist;
     }
 }

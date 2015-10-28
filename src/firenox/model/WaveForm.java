@@ -5,9 +5,8 @@ import firenox.ui.WaveRenderer;
 import javafx.scene.canvas.Canvas;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,28 +16,30 @@ public class WaveForm extends CacheableImage {
     private static Logger log = new Logger(WaveForm.class.getName());
     private static Map<String, File> cacheIndex = CacheableImage.indexCache(ModelManager.WAVE_CACHE_PATH);
     private final String orginalWaveUrl;
-    private WaveRenderer waveRender;
+    private HashMap<String, WaveRenderer> rendererList = new HashMap<>();
 
     public WaveForm(String url) {
         orginalWaveUrl = url;
     }
 
-    public Canvas getCanvas(int width, int height)
-    {
+    public Canvas getCanvas(int width, int height) {
+        String size = width + "x" + height;
+        WaveRenderer waveRender = null;
         try {
-        if (waveRender == null)
-        {
-            waveRender = WaveRenderer.init(getResourceAsStream(orginalWaveUrl, cacheIndex), width, height);
-        }
+            if (rendererList.get(size) == null) {
+                waveRender = WaveRenderer.init(getResourceAsStream(orginalWaveUrl, cacheIndex), width, height);
+                rendererList.put(size, waveRender);
+            } else {
+                waveRender = rendererList.get(size);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return waveRender.renderToFxCanvas();
     }
 
-    public void progressAnimation(double progress)
-    {
-        waveRender.renderProgress(progress);
+    public void progressAnimation(double progress) {
+        rendererList.forEach((s, waveRenderer) -> waveRenderer.renderProgress(progress));
     }
 
     @Override

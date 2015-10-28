@@ -80,6 +80,7 @@ public class LogInHandler {
 
     public static Stream requestStream(String request) throws IOException {
         instance.checkInit();
+        log.d("request = "+request);
         return instance.wrapper.resolveStreamUrl(request, false);
     }
 

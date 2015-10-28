@@ -47,7 +47,7 @@ public abstract class CacheableImage {
         //read in image to check for image corruption
         BufferedImage bi = ImageIO.read(is);
 
-        ImageIO.write(bi, "png", fileToCache);
+        ImageIO.write(bi, "jpg", fileToCache);
 
 //        byte[] buffer = new byte[1024];
 //        int read;
