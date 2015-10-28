@@ -78,6 +78,20 @@ public class LogInHandler {
         return instance.wrapper.get(request);
     }
 
+    public static HttpResponse requestPlayListsWithLimit(String requestUrl, int limit, int page) throws IOException {
+        Request request = null;
+        if (page == 0)
+        {
+            request = Request.to(requestUrl).add("limit", limit).add("representation", "compact");
+        }
+        else
+        {
+            request = Request.to(requestUrl).add("limit", limit).add("linked_partitioning", page)
+                    .add("representation", "compact");
+        }
+        return instance.wrapper.get(request);
+    }
+
     public static Stream requestStream(String request) throws IOException {
         instance.checkInit();
         log.d("request = "+request);

@@ -1,15 +1,14 @@
 package firenox.ui;
 
+import firenox.io.BackgroundLoader;
 import firenox.logger.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
-import javafx.scene.paint.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +31,7 @@ public class WaveRenderer {
     private Canvas canvasRender;
     private Logger log = Logger.getLogger(getClass().getName());
 
-    public WaveRenderer(InputStream is, int width, int height)
-    {
+    public WaveRenderer(InputStream is, int width, int height) {
         try {
             BufferedImage image = ImageIO.read(is);
             original = image;
@@ -58,7 +56,6 @@ public class WaveRenderer {
 
         return result;
     }
-
 
 
     public WritableImage renderWaveFx() {
@@ -103,18 +100,21 @@ public class WaveRenderer {
     public Canvas renderToFxCanvas() {
         Canvas canvas = new Canvas(newWidth, newHeight);
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+//        BackgroundLoader.addTask(() ->
+//        {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        for (int i = 1; i <= stripNr; i++) {
-            double x = spacing * i + (stripWidth * i - 1);
-            double y = getFirstNonOpaquePixel((int) x);
-            gc.setFill(javafx.scene.paint.Color.LIGHTGRAY);
-            gc.fillRect(x, y, stripWidth, newHeight * 0.7 - y);
+            for (int i = 1; i <= stripNr; i++) {
+                double x = spacing * i + (stripWidth * i - 1);
+                double y = getFirstNonOpaquePixel((int) x);
+                gc.setFill(javafx.scene.paint.Color.LIGHTGRAY);
+                gc.fillRect(x, y, stripWidth, newHeight * 0.7 - y);
 
-            gc.setFill(javafx.scene.paint.Color.GRAY);
-            gc.fillRect(x, newHeight * 0.7 + 1, stripWidth, (newHeight * 0.3) - (y * 0.3));
-        }
+                gc.setFill(javafx.scene.paint.Color.GRAY);
+                gc.fillRect(x, newHeight * 0.7 + 1, stripWidth, (newHeight * 0.3) - (y * 0.3));
+            }
 
+//        });
         canvasRender = canvas;
         return canvas;
     }
@@ -123,7 +123,7 @@ public class WaveRenderer {
 
         GraphicsContext gc = canvasRender.getGraphicsContext2D();
 
-        for (int i = 1; i <= stripNr*progress; i++) {
+        for (int i = 1; i <= stripNr * progress; i++) {
             double x = spacing * i + (stripWidth * i - 1);
             double y = getFirstNonOpaquePixel((int) x);
             gc.setFill(javafx.scene.paint.Color.LIGHTCORAL.brighter().brighter());

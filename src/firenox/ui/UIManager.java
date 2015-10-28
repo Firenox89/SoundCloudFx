@@ -1,18 +1,15 @@
 package firenox.ui;
 
 import firenox.media.AudioManager;
+import firenox.model.ModelManager;
 import firenox.model.PagedList;
 import firenox.model.Track;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
@@ -23,9 +20,10 @@ public class UIManager {
 
     private static FXMLController controller;
     private static Parent root;
-    private static LikesPane likesPane;
-    private static StreamPane streamPane;
+    private static TracksPane likesPane;
+    private static TracksPane streamPane;
     private static PlayerPane playerPane;
+    private static PlaylistPane playlistPane;
     private static Track currenTrack;
     private static PagedList<Track> currentPlaylist;
 
@@ -50,25 +48,23 @@ public class UIManager {
     public static void showFavorites() {
         if (likesPane == null)
         {
-            likesPane = new LikesPane();
+            likesPane = new TracksPane(ModelManager.getLikes());
         }
         //TODO: remove listener before setting new content
         getController().getMainScrollPane().setContent(likesPane);
     }
 
+    public static void showTrackList(PagedList<Track> tracks)
+    {
+        getController().getMainScrollPane().setContent(new TracksPane(tracks));
+    }
+
     public static void showPlaylists() {
-        ScrollPane pane = controller.getMainScrollPane();
-
-        try {
-            Canvas canvas = WaveRenderer.init(
-                    new FileInputStream(new File("/home/firenox/soundcloudFx/waves/0DDVFp5Ibia6_m.png")),
-                    650, 80).renderToFxCanvas();
-            pane.setContent(canvas);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (playlistPane == null)
+        {
+            playlistPane = new PlaylistPane();
         }
-
-//        ModelManager.getPlaylists();
+        getController().getMainScrollPane().setContent(playlistPane);
     }
 
     public static void showPlayer() {
@@ -82,7 +78,7 @@ public class UIManager {
     public static void showStream() {
         if (streamPane == null)
         {
-            streamPane = new StreamPane();
+            streamPane = new TracksPane(ModelManager.getStream());
         }
         getController().getMainScrollPane().setContent(streamPane);
     }

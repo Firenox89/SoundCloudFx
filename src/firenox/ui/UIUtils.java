@@ -3,10 +3,7 @@ package firenox.ui;
 import firenox.io.BackgroundLoader;
 import firenox.logger.Logger;
 import firenox.media.AudioManager;
-import firenox.model.ArtWork;
-import firenox.model.PagedList;
-import firenox.model.Track;
-import firenox.model.WaveForm;
+import firenox.model.*;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -76,7 +73,7 @@ public class UIUtils {
                 Image img = new Image(is);
                 if (width != 0 && heigth != 0 && img.getWidth() != width && img.getHeight() != heigth) {
                     img = new Image(artWork.getT500AsStream(), width, heigth, true, true);
-                    System.out.println("rescale");
+                    log.d("Rescaling");
                 }
                 view.setImage(img);
             } catch (IOException e) {
@@ -104,6 +101,23 @@ public class UIUtils {
         box.setCenter(artwork_view);
         Label label = new Label(track.getTitle());
         label.setPrefWidth(artWidth);
+        box.setBottom(label);
+
+        return box;
+    }
+
+    public static BorderPane buildPlayListTile(PlayList playList, int width, int heigth) {
+        BorderPane box = new BorderPane();
+        ArtWork artwork = playList.getArtwork();
+        ImageView artwork_view = new ImageView();
+
+        asyncArtworkAdd(artwork_view, artwork, width, heigth);
+
+        artwork_view.setOnMouseClicked(mouseEvent -> UIManager.showTrackList(playList.getTrackList()));
+
+        box.setCenter(artwork_view);
+        Label label = new Label(playList.getTitle());
+        label.setPrefWidth(width);
         box.setBottom(label);
 
         return box;

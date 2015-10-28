@@ -1,5 +1,6 @@
 package firenox.model;
 
+import firenox.io.Http;
 import firenox.io.LogInHandler;
 import firenox.logger.Logger;
 import org.json.JSONArray;
@@ -21,7 +22,7 @@ public class PagedList<E> extends ArrayList<E> {
     private boolean allLoaded = false;
     private ArrayList<E> lastLoadedEntries;
     private Logger log = Logger.getLogger(getClass().getName());
-    private EntrieChangedListener listener;
+    private EntriesChangedListener listener;
 
     public PagedList(String url, int limit, Class<E> type) {
         this.url = url;
@@ -38,22 +39,26 @@ public class PagedList<E> extends ArrayList<E> {
         log.d("loadNextEntries");
         ArrayList<E> newEntries = null;
         if (!allLoaded) {
+            String json = null;
             try {
                 newEntries = new ArrayList<>();
                 int page = 1;
-                String json;
                 if (next_href == null) {
                     json = LogInHandler.getStringWithLimit(url, limit, page);
                 } else {
                     json = LogInHandler.getString(next_href);
+                    //clear the href for the next round
+                    next_href = null;
                 }
                 JSONObject response = new JSONObject(json);
                 JSONArray jsonArray = response.getJSONArray("collection");
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    E entire = type.getConstructor(JSONObject.class).newInstance((JSONObject) jsonArray.get(i));
+                    E entire = type.getConstructor(JSONObject.class).newInstance(jsonArray.getJSONObject(i));
                     newEntries.add(entire);
                 }
-                next_href = response.getString("next_href");
+                if (response.has("next_href")) {
+                    next_href = response.getString("next_href");
+                }
                 if (next_href == null) {
                     allLoaded = true;
                 }
@@ -63,6 +68,7 @@ public class PagedList<E> extends ArrayList<E> {
                     listener.entrieChanged();
                 }
             } catch (JSONException e) {
+                log.e(Http.formatJSON(json));
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
@@ -84,7 +90,7 @@ public class PagedList<E> extends ArrayList<E> {
         return super.get(index);
     }
 
-    public void setNewEntriesLoadedListener(EntrieChangedListener listener) {
+    public void setNewEntriesLoadedListener(EntriesChangedListener listener) {
         log.d("setNewEntriesLoadedListener");
         this.listener = listener;
     }

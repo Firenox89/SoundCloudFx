@@ -1,6 +1,5 @@
 package firenox.ui;
 
-import firenox.model.ModelManager;
 import firenox.model.PagedList;
 import firenox.model.Track;
 import javafx.geometry.Insets;
@@ -14,7 +13,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by firenox on 10/8/15.
  */
-public class LikesPane extends BorderPane {
+public class TracksPane extends BorderPane {
 
     private final int waveWidth = 650;
     private final int waveHeigth = 80;
@@ -22,8 +21,7 @@ public class LikesPane extends BorderPane {
     private final int artHeigth = 100;
     private DisplayMode defaultMode = DisplayMode.List;
 
-    public LikesPane() {
-        PagedList<Track> favList = ModelManager.getLikes();
+    public TracksPane(PagedList<Track> favList) {
         if (defaultMode == DisplayMode.List) {
             setCenter(buildListView(favList));
         }

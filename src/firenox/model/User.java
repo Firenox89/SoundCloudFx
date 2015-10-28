@@ -5,6 +5,8 @@ import firenox.logger.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 /**
  * Created by firenox on 10/6/15.
  */
@@ -19,12 +21,11 @@ public class User {
     private PagedList<Track> likesList;
     private int LIMIT = 10;
     private PagedList<Track> streamList;
+    private PagedList<PlayList> playLists;
 
     public User(JSONObject jsonObject) {
         parseJSON(jsonObject);
 
-        likesList = new PagedList<>(Endpoints.MY_FAVORITES, LIMIT, Track.class);
-        streamList = new PagedList<>(Endpoints.MY_ACTIVITIES, LIMIT, Track.class);
     }
 
     private void parseJSON(JSONObject jsonObject) {
@@ -48,6 +49,9 @@ public class User {
     }
 
     public PagedList<Track> getLikesList() {
+        if (likesList == null) {
+            likesList = new PagedList<>(Endpoints.MY_FAVORITES, LIMIT, Track.class);
+        }
         return likesList;
     }
 
@@ -76,6 +80,17 @@ public class User {
     }
 
     public PagedList<Track> getStream() {
+        if (streamList == null) {
+            streamList = new PagedList<>(Endpoints.MY_ACTIVITIES, LIMIT, Track.class);
+        }
         return streamList;
+    }
+
+    public PagedList<PlayList> getPlaylists() {
+
+        if (playLists == null) {
+            playLists = new PagedList<PlayList>(Endpoints.MY_PLAYLISTS, LIMIT, PlayList.class);
+        }
+        return playLists;
     }
 }

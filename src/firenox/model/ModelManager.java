@@ -1,13 +1,10 @@
 package firenox.model;
 
 import com.soundcloud.api.Endpoints;
-import firenox.io.Http;
 import firenox.io.LogInHandler;
 import firenox.logger.Logger;
-import org.apache.http.HttpResponse;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
@@ -73,21 +70,8 @@ public class ModelManager {
         return getMe().getLikesList();
     }
 
-    public static void getPlaylists() {
-        try {
-            HttpResponse resp = LogInHandler.requestWithLimit(Endpoints.PLAYLISTS, 5, 0);
-            System.out.println(resp.getStatusLine().getReasonPhrase());
-            Thread.sleep(1000);
-            String response = Http.formatJSON(Http.getString(resp));
-            System.out.println(response);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+    public static PagedList<PlayList> getMyPlaylists() {
+        return getMe().getPlaylists();
     }
 
     public User loadUser(String name) {
