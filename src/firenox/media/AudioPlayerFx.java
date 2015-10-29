@@ -114,7 +114,7 @@ public class AudioPlayerFx implements IAudioPlayer {
                 int current = currentPlaylist.indexOf(currentTrack);
                 if (repeat) {
                     open(currentPlaylist.get(current));
-                } else {
+                } else if (currentPlaylist.size() > current){
                     open(currentPlaylist.get(++current));
                 }
             }

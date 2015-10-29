@@ -37,7 +37,8 @@ public class UIManager {
         }
         controller = loader.getController();
         AudioManager.getPlayerFx().bindVolume(controller.getVolumeSlider().valueProperty());
-        stage.setScene(new Scene(root, 800, 600));
+        Scene scene = new Scene(root, 800, 600);
+        stage.setScene(scene);
         stage.show();
     }
 
@@ -56,6 +57,7 @@ public class UIManager {
 
     public static void showTrackList(PagedList<Track> tracks)
     {
+        //TODO: reset scrollpane viewport
         getController().getMainScrollPane().setContent(new TracksPane(tracks));
     }
 

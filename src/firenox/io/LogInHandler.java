@@ -35,139 +35,53 @@ public class LogInHandler {
     private static String CLIENT_SECRET = credentials.getProperty("client.secret");
     private static String DEFAULT_LOGIN = credentials.getProperty("default.login");
     private static String DEFAULT_PASS = credentials.getProperty("default.pass");
-    private static LogInHandler instance = new LogInHandler();
+
     private static Logger log = Logger.getLogger(LogInHandler.class.getName());
 
 
-    private ApiWrapper wrapper;
-    private boolean loggedIn;
+    private static ApiWrapper wrapper;
+    private static boolean loggedIn;
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private LogInHandler() {
-    }
-
     public static void init() {
-        instance.connect(DEFAULT_LOGIN, DEFAULT_PASS);
+        connect(DEFAULT_LOGIN, DEFAULT_PASS);
+        RequestManager.init(wrapper);
     }
 
 
     public static boolean isLoggedIn() {
-        return instance.loggedIn;
-    }
-
-    public static HttpResponse request(String request) throws IOException {
-        instance.checkInit();
-        return instance.wrapper.get(Request.to(request));
-    }
-
-    public static HttpResponse request(Request request) throws IOException {
-        instance.checkInit();
-        return instance.wrapper.get(request);
-    }
-
-    public static HttpResponse requestWithLimit(String requestUrl, int limit, int page) throws IOException {
-        Request request = null;
-        if (page == 0)
-        {
-            request = Request.to(requestUrl).add("limit", limit);
-        }
-        else
-        {
-            request = Request.to(requestUrl).add("limit", limit).add("linked_partitioning", page);
-        }
-        return instance.wrapper.get(request);
-    }
-
-    public static HttpResponse requestPlayListsWithLimit(String requestUrl, int limit, int page) throws IOException {
-        Request request = null;
-        if (page == 0)
-        {
-            request = Request.to(requestUrl).add("limit", limit).add("representation", "compact");
-        }
-        else
-        {
-            request = Request.to(requestUrl).add("limit", limit).add("linked_partitioning", page)
-                    .add("representation", "compact");
-        }
-        return instance.wrapper.get(request);
-    }
-
-    public static Stream requestStream(String request) throws IOException {
-        instance.checkInit();
-        log.d("request = "+request);
-        return instance.wrapper.resolveStreamUrl(request, false);
+        return loggedIn;
     }
 
     public static void connect(String login, String password) {
         if (WRAPPER_SER.exists()) {
             try {
-                instance.wrapper = ApiWrapper.fromFile(WRAPPER_SER);
-                if (instance.wrapper.getToken().getExpiresIn().before(new Date())) {
-                    instance.wrapper.refreshToken();
-                    log.d("Token refreshed valid until: " + instance.wrapper.getToken().getExpiresIn());
-                    instance.wrapper.toFile(WRAPPER_SER);
+                wrapper = ApiWrapper.fromFile(WRAPPER_SER);
+                if (wrapper.getToken().getExpiresIn().before(new Date())) {
+                    wrapper.refreshToken();
+                    log.d("Token refreshed valid until: " + wrapper.getToken().getExpiresIn());
+                    wrapper.toFile(WRAPPER_SER);
                 }
-                log.d(instance.wrapper.getToken());
+                log.d(wrapper.getToken());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         } else {
-            instance.wrapper = instance.serialises(login, password);
+            wrapper = serialises(login, password);
         }
-        if (instance.wrapper != null)
-            instance.loggedIn = true;
+        if (wrapper != null)
+            loggedIn = true;
     }
 
-    public static InputStream getResource(String url) throws IOException {
-        HttpGet httpget = new HttpGet(url);
-
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response = httpclient.execute(httpget);
-        HttpEntity entity = response.getEntity();
-        InputStream is = entity.getContent();
-
-        return is;
-    }
-
-    public static String getStringWithLimit(String url, int limit, int page) {
-        String string = null;
-        try {
-            string = Http.getString(requestWithLimit(url, limit, page));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return string;
-    }
-
-    public static String getString(String url) {
-        String string = null;
-        try {
-            string = Http.getString(request(url));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return string;
-    }
-
-    public static JSONObject getJSON(String url) {
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = Http.getJSON(request(url));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    private void checkInit() {
-        if (loggedIn == false) {
+    public static void checkInit() {
+        if (isLoggedIn() == false) {
             throw new IllegalStateException("Not logged in");
         }
     }
 
-    public ApiWrapper serialises(String login, String pass) {
+    private static ApiWrapper serialises(String login, String pass) {
         if (CLIENT_ID == null || CLIENT_ID.equals(""))
             throw new IllegalStateException("Client_Id is empty.");
         if (CLIENT_SECRET == null || CLIENT_SECRET.equals(""))

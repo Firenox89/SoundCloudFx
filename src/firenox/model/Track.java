@@ -1,7 +1,7 @@
 package firenox.model;
 
 import com.soundcloud.api.Stream;
-import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.logger.Logger;
 import firenox.statistics.Traffic;
 import org.apache.http.HttpEntity;
@@ -42,7 +42,7 @@ public class Track {
             if (jsonObject.has("origin"))
             {
                 long id = jsonObject.getJSONObject("origin").getLong("id");
-                jsonObject = LogInHandler.getJSON("/tracks/"+id);
+                jsonObject = RequestManager.getJSON("/tracks/"+id);
             }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
@@ -116,7 +116,7 @@ public class Track {
     }
 
     public InputStream getMP3Stream() throws IOException {
-        Stream stream = LogInHandler.requestStream(stream_url);
+        Stream stream = RequestManager.requestStream(stream_url);
         HttpGet httpget = new HttpGet(stream.streamUrl);
 
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -130,7 +130,7 @@ public class Track {
     public String getStreamURL() {
         Stream stream = null;
         try {
-            stream = LogInHandler.requestStream(stream_url);
+            stream = RequestManager.requestStream(stream_url);
         } catch (IOException e) {
             e.printStackTrace();
         }

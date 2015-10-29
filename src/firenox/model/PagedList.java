@@ -1,7 +1,7 @@
 package firenox.model;
 
 import firenox.io.Http;
-import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.logger.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,9 +44,9 @@ public class PagedList<E> extends ArrayList<E> {
                 newEntries = new ArrayList<>();
                 int page = 1;
                 if (next_href == null) {
-                    json = LogInHandler.getStringWithLimit(url, limit, page);
+                    json = RequestManager.getStringWithLimit(url, limit, page);
                 } else {
-                    json = LogInHandler.getString(next_href);
+                    json = RequestManager.getString(next_href);
                     //clear the href for the next round
                     next_href = null;
                 }

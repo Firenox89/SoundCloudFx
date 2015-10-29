@@ -1,6 +1,6 @@
 package firenox.model;
 
-import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.logger.Logger;
 import firenox.statistics.Traffic;
 
@@ -40,7 +40,7 @@ public abstract class CacheableImage {
         if (useFallback()) {
             is = new FileInputStream(new File(getFallbackUrl()));
         } else {
-            is = LogInHandler.getResource(url);
+            is = RequestManager.getResource(url);
         }
         FileOutputStream fos = new FileOutputStream(fileToCache);
 

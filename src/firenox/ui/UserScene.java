@@ -1,6 +1,6 @@
 package firenox.ui;
 
-import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.model.User;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -38,7 +38,7 @@ public class UserScene extends Scene {
     public void updateUser(User currentUser) {
         this.currentUser = currentUser;
         try {
-            avatar = new Image(LogInHandler.getResource(currentUser.getAvatar_url()));
+            avatar = new Image(RequestManager.getResource(currentUser.getAvatar_url()));
             name = currentUser.getUsername();
         } catch (IOException e) {
             e.printStackTrace();

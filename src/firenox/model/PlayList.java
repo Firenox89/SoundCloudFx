@@ -1,7 +1,7 @@
 package firenox.model;
 
 import com.soundcloud.api.Endpoints;
-import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.logger.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,7 +34,7 @@ public class PlayList {
 
             if (jsonObject.has("origin")) {
                 long id = jsonObject.getJSONObject("origin").getLong("id");
-                jsonObject = LogInHandler.getJSON("/playlists/" + id);
+                jsonObject = RequestManager.getJSON("/playlists/" + id);
             }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
@@ -46,7 +46,7 @@ public class PlayList {
             //in case the artwork is null use the user avatar
             if (artwork_url.equals("null")) {
                 //use artwork from first Track
-                String response = LogInHandler.getStringWithLimit(String.format(Endpoints.PLAYLIST_TRACKS, id), 1, 0);
+                String response = RequestManager.getStringWithLimit(String.format(Endpoints.PLAYLIST_TRACKS, id), 1, 0);
                 JSONObject firstTrack = new JSONArray(response).getJSONObject(0);
                 artwork_url = firstTrack.getString("artwork_url");
 

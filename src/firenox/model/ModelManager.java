@@ -1,7 +1,7 @@
 package firenox.model;
 
 import com.soundcloud.api.Endpoints;
-import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.logger.Logger;
 
 import java.io.File;
@@ -75,11 +75,11 @@ public class ModelManager {
     }
 
     public User loadUser(String name) {
-        return new User(LogInHandler.getJSON(name));
+        return new User(RequestManager.getJSON(name));
     }
 
     public Track loadTrack(String name) {
-        return new Track(LogInHandler.getJSON(name));
+        return new Track(RequestManager.getJSON(name));
     }
 
     public static PagedList<Track> getStream() {

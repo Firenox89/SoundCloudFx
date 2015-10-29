@@ -4,6 +4,7 @@ import com.soundcloud.api.Endpoints;
 import firenox.io.BackgroundLoader;
 import firenox.io.Http;
 import firenox.io.LogInHandler;
+import firenox.io.RequestManager;
 import firenox.statistics.Traffic;
 import firenox.ui.UIManager;
 import firenox.ui.WaveRenderer;
@@ -50,7 +51,7 @@ public class Player extends Application {
     }
 
     private void testLink() {
-        System.out.println(Http.formatJSON(LogInHandler.getString(Endpoints.MY_FAVORITES)));
+        System.out.println(Http.formatJSON(RequestManager.getString(Endpoints.MY_FAVORITES)));
     }
 
     private void testScene(Stage stage) {
