@@ -67,14 +67,12 @@ public class UIUtils {
                     is = artWork.getLargeAsStream();
                 } else if (width == 300) {
                     is = artWork.getT300AsStream();
-                } else {
+                } else if (width == 500){
                     is = artWork.getT500AsStream();
+                } else {
+                    is = artWork.getCustomSize(width, heigth);
                 }
                 Image img = new Image(is);
-                if (width != 0 && heigth != 0 && img.getWidth() != width && img.getHeight() != heigth) {
-                    img = new Image(artWork.getT500AsStream(), width, heigth, true, true);
-                    log.d("Rescaling");
-                }
                 view.setImage(img);
             } catch (IOException e) {
                 e.printStackTrace();

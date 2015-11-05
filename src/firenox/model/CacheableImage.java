@@ -2,11 +2,13 @@ package firenox.model;
 
 import firenox.io.RequestManager;
 import firenox.logger.Logger;
-import firenox.statistics.Traffic;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,11 +28,9 @@ public abstract class CacheableImage {
         if (!cacheDir.exists()) {
             cacheDir.mkdirs();
         }
-        if (cacheDir != null && cacheDir.exists() && cacheDir.isDirectory()) {
-            index = Arrays.stream(cacheDir.listFiles())
-                    .filter(File::isFile)
-                    .collect(Collectors.toMap(File::getName, Function.<File>identity()));
-        }
+        index = Arrays.stream(cacheDir.listFiles())
+                .filter(File::isFile)
+                .collect(Collectors.toMap(File::getName, Function.<File>identity()));
         return index;
     }
 
@@ -42,7 +42,7 @@ public abstract class CacheableImage {
         } else {
             is = RequestManager.getResource(url);
         }
-        FileOutputStream fos = new FileOutputStream(fileToCache);
+//        FileOutputStream fos = new FileOutputStream(fileToCache);
 
         //read in image to check for image corruption
         BufferedImage bi = ImageIO.read(is);

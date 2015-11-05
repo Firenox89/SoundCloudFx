@@ -1,8 +1,13 @@
 package firenox.model;
 
+import com.mortennobel.imagescaling.AdvancedResizeOp;
+import com.mortennobel.imagescaling.ResampleOp;
 import firenox.logger.Logger;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -59,6 +64,32 @@ public class ArtWork extends CacheableImage {
         return getResourceAsStream(urlT67, cacheIndex);
     }
 
+    public InputStream getCustomSize(int width, int heigth) throws IOException {
+        String url = urlLarge.replace("large", "t" + width + "x" + heigth);
+        InputStream out;
+
+        if (cacheIndex.get(url) == null) {
+            InputStream is = null;
+            if (width <= 100) {
+                is = getLargeAsStream();
+            } else if (width <= 300) {
+                is = getT300AsStream();
+            } else {
+                is = getT500AsStream();
+            }
+
+            BufferedImage img = ImageIO.read(is);
+            ResampleOp resampleOp = new ResampleOp(width, heigth);
+            img = resampleOp.filter(img, null);
+            File fileToCache = new File(getCachePath() + File.separator + getNameFromUrl(url));
+            ImageIO.write(img, "jpg", fileToCache);
+            cacheIndex.put(getNameFromUrl(url), fileToCache);
+        }
+        out = new FileInputStream(cacheIndex.get(getNameFromUrl(url)));
+
+        return out;
+    }
+
     @Override
     protected String getFallbackUrl() {
         return urlFallBack;
@@ -73,4 +104,5 @@ public class ArtWork extends CacheableImage {
     protected String getCachePath() {
         return ModelManager.ARTWORKS_CACHE_PATH;
     }
+
 }
