@@ -24,7 +24,7 @@ public class UIManager {
     private static TracksPane streamPane;
     private static PlayerPane playerPane;
     private static PlaylistPane playlistPane;
-    private static Track currenTrack;
+    private static Track currentTrack;
     private static PagedList<Track> currentPlaylist;
 
     public static void init(Stage stage) {
@@ -38,6 +38,7 @@ public class UIManager {
         controller = loader.getController();
         AudioManager.getPlayerFx().bindVolume(controller.getVolumeSlider().valueProperty());
         Scene scene = new Scene(root, 800, 600);
+
         stage.setScene(scene);
         stage.show();
     }
@@ -89,7 +90,7 @@ public class UIManager {
     }
 
     public static void setTrackForPlayerUI(Track track, PagedList<Track> playlist) {
-        currenTrack = track;
+        currentTrack = track;
         currentPlaylist = playlist;
         try {
             controller.getArtWork().setImage(new Image(track.getArtwork().getLargeAsStream(), 40, 40, true, true));
@@ -115,7 +116,7 @@ public class UIManager {
     }
 
     public static Track getCurrentTrack() {
-        return currenTrack;
+        return currentTrack;
     }
 
     public static PagedList<Track> getCurrentPlaylist() {

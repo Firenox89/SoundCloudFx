@@ -16,16 +16,17 @@ public class BackgroundLoader extends Thread {
     private BackgroundLoader() {
     }
 
-    public static void addTask(Runnable task) {
-        taskQueue.add(task);
-    }
-
     public static void init() {
         if (!instance.isAlive()) {
             instance.setDaemon(true);
             instance.start();
         }
     }
+
+    public static void addTask(Runnable task) {
+        taskQueue.add(task);
+    }
+
 
     @Override
     public void run() {

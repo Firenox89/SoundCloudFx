@@ -75,9 +75,10 @@ public class WaveRenderer {
         double yc = 0;
         double xc = x * xinc;
         int y = 0;
+
         int value = original.getRGB((int) xc, (int) yc);
 
-        while (value != 0) {
+        while (value != 0 && (yc + yinc) < original.getHeight()) {
             yc += yinc;
             y++;
             value = original.getRGB((int) xc, (int) yc);
