@@ -1,6 +1,8 @@
 package firenox.model;
 
+import com.soundcloud.api.Endpoints;
 import com.soundcloud.api.Stream;
+import firenox.io.Http;
 import firenox.io.RequestManager;
 import firenox.logger.Logger;
 import firenox.statistics.Traffic;
@@ -30,6 +32,7 @@ public class Track {
     WaveForm waveform;
     private JSONObject jsonObject;
     private User user;
+    private String user_name;
 
     public Track(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
@@ -38,14 +41,13 @@ public class Track {
 
     private void parseJSON(JSONObject jsonObject) {
         try {
-
-            if (jsonObject.has("origin"))
-            {
+            if (jsonObject.has("origin")) {
                 long id = jsonObject.getJSONObject("origin").getLong("id");
-                jsonObject = RequestManager.getJSON("/tracks/"+id);
+                jsonObject = RequestManager.getJSON(String.format(Endpoints.TRACK_DETAILS, id));
             }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
+            user_name = jsonObject.getJSONObject("user").getString("username");
             permalink = jsonObject.getString("permalink");
             title = jsonObject.getString("title");
             uri = jsonObject.getString("uri");
@@ -55,8 +57,7 @@ public class Track {
             waveform = new WaveForm(jsonObject.getString("waveform_url"));
             String artwork_url = jsonObject.getString("artwork_url");
             //in case the artwork is null use the user avatar
-            if (artwork_url.equals("null"))
-            {
+            if (artwork_url.equals("null")) {
                 artwork_url = jsonObject.getJSONObject("user").getString("avatar_url");
             }
             artwork = new ArtWork(artwork_url);
@@ -71,7 +72,8 @@ public class Track {
             log.i("duration " + duration);
             log.i("waveform " + waveform);
         } catch (JSONException e) {
-            e.printStackTrace();
+            log.e(e);
+            log.e(Http.formatJSON(jsonObject.toString()));
         }
     }
 
@@ -157,5 +159,16 @@ public class Track {
             e.printStackTrace();
         }
         return url;
+    }
+
+    public User getUser() {
+        if (user == null) {
+            user = ModelManager.getUser(user_id);
+        }
+        return user;
+    }
+
+    public String getUser_name() {
+        return user_name;
     }
 }

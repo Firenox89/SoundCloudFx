@@ -40,14 +40,18 @@ public class ModelManager {
     private ModelManager() {
     }
 
-    public static User getUser(String name) {
-        User user = userList.get(name);
+    public static User getUser(String url) {
+        User user = userList.get(url);
 
         if (user == null) {
-            user = instance.loadUser(name);
-            userList.put(name, user);
+            user = instance.loadUser(url);
+            userList.put(url, user);
         }
         return user;
+    }
+
+    public static User getUser(int id) {
+        return getUser(String.format(Endpoints.USER_DETAILS, id));
     }
 
     public static User getMe() {
@@ -74,8 +78,8 @@ public class ModelManager {
         return getMe().getPlaylists();
     }
 
-    public User loadUser(String name) {
-        return new User(RequestManager.getJSON(name));
+    public User loadUser(String url) {
+        return new User(RequestManager.getJSON(url));
     }
 
     public Track loadTrack(String name) {

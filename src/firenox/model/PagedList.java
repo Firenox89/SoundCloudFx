@@ -53,8 +53,17 @@ public class PagedList<E> extends ArrayList<E> {
                 JSONObject response = new JSONObject(json);
                 JSONArray jsonArray = response.getJSONArray("collection");
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    E entire = type.getConstructor(JSONObject.class).newInstance(jsonArray.getJSONObject(i));
-                    newEntries.add(entire);
+                    String kind;
+                    if (jsonArray.getJSONObject(i).has("origin")) {
+                        kind = jsonArray.getJSONObject(i).getJSONObject("origin").getString("kind");
+                    } else {
+                        kind = jsonArray.getJSONObject(i).getString("kind");
+                    }
+                    if ((type == Track.class && kind.equals("track"))
+                            || type == PlayList.class && kind.equals("playlist")) {
+                        E entire = type.getConstructor(JSONObject.class).newInstance(jsonArray.getJSONObject(i));
+                        newEntries.add(entire);
+                    }
                 }
                 if (response.has("next_href")) {
                     next_href = response.getString("next_href");
@@ -68,8 +77,8 @@ public class PagedList<E> extends ArrayList<E> {
                     listener.entrieChanged();
                 }
             } catch (JSONException e) {
+                log.e(e);
                 log.e(Http.formatJSON(json));
-                e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             } catch (NoSuchMethodException e) {

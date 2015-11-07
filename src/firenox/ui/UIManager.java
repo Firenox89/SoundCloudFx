@@ -102,6 +102,7 @@ public class UIManager {
         DecimalFormat secondFormater = new DecimalFormat("00");
 
         controller.getTitleLabel().setText(track.getTitle());
+        controller.getUserLabel().setText(track.getUser_name());
         controller.getProgressSlider().setMax(duration);
 
         controller.getTrackTime().setText((duration/60) + ":" + secondFormater.format(duration % 60));

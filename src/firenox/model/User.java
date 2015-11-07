@@ -1,6 +1,7 @@
 package firenox.model;
 
 import com.soundcloud.api.Endpoints;
+import firenox.io.Http;
 import firenox.logger.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,12 +26,15 @@ public class User {
 
     public User(JSONObject jsonObject) {
         parseJSON(jsonObject);
+    }
+
+    public User(int user_id) {
 
     }
 
+
     private void parseJSON(JSONObject jsonObject) {
         try {
-//            jsonObject.keys().forEachRemaining(System.out::println);
             this.id = (int) jsonObject.get("id");
             this.permalink = jsonObject.getString("permalink");
             this.username = jsonObject.getString("username");
@@ -44,7 +48,8 @@ public class User {
             log.i("permalink_url " + permalink_url);
             log.i("avatar_url " + avatar_url);
         } catch (JSONException e) {
-            e.printStackTrace();
+            log.e(e);
+            log.e(Http.formatJSON(jsonObject.toString()));
         }
     }
 

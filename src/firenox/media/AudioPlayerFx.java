@@ -138,7 +138,7 @@ public class AudioPlayerFx implements IAudioPlayer {
     @Override
     public void toggleRepeat() {
         log.d("toggleRepeat");
-
+        repeat = !repeat;
     }
 
     @Override
@@ -163,6 +163,12 @@ public class AudioPlayerFx implements IAudioPlayer {
     public void setMediaPausedListener(MediaEventListener listener) {
         log.d("setMediaPausedListener");
         player.setOnPaused(listener::mediaEvent);
+    }
+
+    @Override
+    public void toggleShuffle() {
+        log.d("toggleShuffle");
+        shuffle = !shuffle;
     }
 
     public void setProgressTimeListener(ChangeListener<Duration> listener) {

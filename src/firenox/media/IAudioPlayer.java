@@ -29,4 +29,6 @@ interface IAudioPlayer {
     void setMediaEndListener(MediaEventListener listener);
 
     void setMediaPausedListener(MediaEventListener listener);
+
+    void toggleShuffle();
 }

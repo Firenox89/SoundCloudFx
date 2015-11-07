@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 
 public class FXMLController {
     @FXML private Label titleLabel;
+    @FXML private Label userLabel;
     @FXML private ImageView artWork;
     @FXML private Slider progressSlider;
     @FXML private Slider volumeSlider;
@@ -86,4 +87,15 @@ public class FXMLController {
         return playbackTime;
     }
 
+    public Label getUserLabel() {
+        return userLabel;
+    }
+
+    public void handleShuffle(ActionEvent actionEvent) {
+        AudioManager.getPlayerFx().toggleShuffle();
+    }
+
+    public void handleRepeat(ActionEvent actionEvent) {
+        AudioManager.getPlayerFx().toggleRepeat();
+    }
 }

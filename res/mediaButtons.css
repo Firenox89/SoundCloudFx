@@ -22,6 +22,8 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position:left;
 }
+#repeatBtn{}
+#shuffleBtn{}
 #coverPlaceholder {
     -fx-background-image: url("shinbuAva.png");
     -fx-background-color: transparent;
@@ -30,6 +32,9 @@
     -fx-background-position:left;
 }
 #titleLabel {
+    -fx-text-fill: #E9E9E9;
+}
+#userLabel {
     -fx-text-fill: #E9E9E9;
 }
 #playbackTime {
