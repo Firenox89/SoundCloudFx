@@ -35,9 +35,9 @@ public class Player extends Application {
         //should return true in the version I desire
         //MediaManager.canPlayProtocol("https");
 
-        UIManager.init(primaryStage);
         LogInHandler.init();
         BackgroundLoader.init();
+        UIManager.init(primaryStage);
     }
 
     private void testLogic() {

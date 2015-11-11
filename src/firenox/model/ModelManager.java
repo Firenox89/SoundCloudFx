@@ -70,8 +70,12 @@ public class ModelManager {
         return track;
     }
 
-    public static PagedList<Track> getLikes() {
-        return getMe().getLikesList();
+    public static PagedList<Track> getMyLikes() {
+        return getMe().getLikes();
+    }
+
+    public static PagedList<Track> getMyRepost() {
+        return getMe().getReposts();
     }
 
     public static PagedList<PlayList> getMyPlaylists() {

@@ -1,5 +1,6 @@
 package firenox.media;
 
+import firenox.io.BackgroundLoader;
 import firenox.logger.Logger;
 import firenox.model.PagedList;
 import firenox.model.Track;
@@ -9,8 +10,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-
-import java.util.ArrayList;
 
 /**
  * Created by firenox on 10/6/15.
@@ -63,24 +62,27 @@ public class AudioPlayerFx implements IAudioPlayer {
     }
 
     public void open(Track track) {
-        currentTrack = track;
-        String url = track.getStreamURL();
+        BackgroundLoader.addTaskWithtimeout(() ->
+        {
+            currentTrack = track;
+            String url = track.getStreamURL();
 
-        log.d("open: " + url);
-        currentMedia = new Media(url);
-        stop();
+            log.d("open: " + url);
+            currentMedia = new Media(url);
+            stop();
 
-        player = new MediaPlayer(currentMedia);
+            player = new MediaPlayer(currentMedia);
 
-        player.volumeProperty().bindBidirectional(volumeSliderProb);
-        volumeSliderProb.setValue(defaultVolume);
-        player.setOnEndOfMedia(this::next);
-        //TODO: append listener to new player
+            player.volumeProperty().bindBidirectional(volumeSliderProb);
+            volumeSliderProb.setValue(defaultVolume);
+            player.setOnEndOfMedia(this::next);
+            //TODO: append listener to new player
 
-        player.play();
-        isPlaying = true;
+            player.play();
+            isPlaying = true;
 
-        UIManager.setTrackForPlayerUI(currentTrack, currentPlaylist);
+            UIManager.setTrackForPlayerUI(currentTrack, currentPlaylist);
+        }, 5*1000);
     }
 
     public void open(PagedList<Track> playlist, int startIndex) {
@@ -114,8 +116,10 @@ public class AudioPlayerFx implements IAudioPlayer {
                 int current = currentPlaylist.indexOf(currentTrack);
                 if (repeat) {
                     open(currentPlaylist.get(current));
-                } else if (currentPlaylist.size() > current){
+                } else if (currentPlaylist.size() > current) {
                     open(currentPlaylist.get(++current));
+                } else {
+                    log.d("end of list");
                 }
             }
         }

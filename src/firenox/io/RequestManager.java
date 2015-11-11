@@ -20,6 +20,10 @@ import java.io.InputStream;
  */
 public class RequestManager {
 
+
+    public static String USER_REPOSTS = "/users/%d/reposts";
+    private static String USER_REPOSTS_API = "https://api-v2.soundcloud.com/profile/soundcloud:users:%d?limit=%d&offset=%d";
+
     private static Logger log = Logger.getLogger(RequestManager.class.getName());
     private static ApiWrapper wrapper;
 
@@ -37,7 +41,6 @@ public class RequestManager {
      *
      * @param request the request URL
      * @return the HttpResponse for the given URL
-     *
      * @throws IOException
      */
     public static HttpResponse request(String request) throws IOException {
@@ -49,9 +52,7 @@ public class RequestManager {
      * Executes a given request.
      *
      * @param request the request to be executed.
-     *
      * @return the respones for the given request.
-     *
      * @throws IOException
      */
     public static HttpResponse request(Request request) throws IOException {
@@ -64,15 +65,14 @@ public class RequestManager {
      * with a response limit using the paging function of the Soundcloud APIs.
      *
      * @param requestUrl the request URL
-     * @param limit the response limit
-     * @param page the page offset
-     *
+     * @param limit      the response limit
+     * @param page       the page offset
      * @return the HttpResponse for the given URL
-     *
      * @throws IOException
      */
     public static HttpResponse requestWithLimit(String requestUrl, int limit, int page) throws IOException {
         Request request;
+        log.d("request = " + requestUrl);
         if (page == 0) {
             request = Request.to(requestUrl).add("limit", limit);
         } else {
@@ -87,11 +87,9 @@ public class RequestManager {
      * and the compact representation filter for playlists.
      *
      * @param requestUrl the request URL
-     * @param limit the response limit
-     * @param page the page offset
-     *
+     * @param limit      the response limit
+     * @param page       the page offset
      * @return the HttpResponse for the given URL
-     *
      * @throws IOException
      */
     public static HttpResponse requestPlayListsWithLimit(String requestUrl, int limit, int page) throws IOException {
@@ -110,9 +108,7 @@ public class RequestManager {
      * Request a Stream representation for the given URL.
      *
      * @param request the request URL
-     *
      * @return a Stream object for the given URL
-     *
      * @throws IOException
      */
     public static Stream requestStream(String request) throws IOException {
@@ -131,46 +127,59 @@ public class RequestManager {
      * @throws IOException
      */
     public static InputStream getResource(String url) throws IOException {
-        HttpGet httpget = new HttpGet(url);
-
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response = httpclient.execute(httpget);
+        HttpResponse response = requestResource(url);
         HttpEntity entity = response.getEntity();
         InputStream is = entity.getContent();
 
         return is;
     }
 
+    public static HttpResponse requestResource(String url) throws IOException {
+        HttpGet httpget = new HttpGet(url);
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        return httpclient.execute(httpget);
+    }
+
     /**
      * Like {@link #requestWithLimit(String, int, int)} but directly returns a String.
      *
      * @param requestUrl the request URL
-     * @param limit the response limit
-     * @param page the page offset
-     *
+     * @param limit      the response limit
+     * @param page       the page offset
      * @return the String representation of the response
      */
     public static String getStringWithLimit(String requestUrl, int limit, int page) {
         String string = null;
         try {
-            string = Http.getString(requestWithLimit(requestUrl, limit, page));
+            if (requestUrl.contains("playlists")) {
+                string = Http.getString(requestPlayListsWithLimit(requestUrl, limit, page));
+            } else if (requestUrl.contains("reposts")) {
+                int userId = Integer.parseInt(requestUrl.substring(7, requestUrl.length() - 8));
+                string = Http.getString(requestResource(String.format(USER_REPOSTS_API, userId, limit, page)));
+            } else {
+                string = Http.getString(requestWithLimit(requestUrl, limit, page));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return string;
     }
 
-     /**
+    /**
      * Like {@link #request(String)} but directly returns a String.
      *
      * @param requestUrl the request URL
-     *
      * @return the String representation of the response
      */
     public static String getString(String requestUrl) {
         String string = null;
         try {
-            string = Http.getString(request(requestUrl));
+            //TODO: should be handled in the soundcloud api wrapper
+            if (requestUrl.startsWith("https://api-v2")) {
+                string = Http.getString(requestResource(requestUrl));
+            } else {
+                string = Http.getString(request(requestUrl));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -181,7 +190,6 @@ public class RequestManager {
      * Like {@link #request(String)} but directly returns a JSONObject.
      *
      * @param requestUrl the request URL
-     *
      * @return the JSONObject representation of the response
      */
     public static JSONObject getJSON(String requestUrl) {

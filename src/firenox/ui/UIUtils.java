@@ -28,18 +28,20 @@ public class UIUtils {
     public static BorderPane buildTrackContainer(Track track,
                                                  PagedList<Track> list,
                                                  int waveWidth,
-                                                 int waveHeigth,
+                                                 int waveHeight,
                                                  int artWidth,
-                                                 int artHeigth) {
+                                                 int artHeight) {
         BorderPane box = new BorderPane();
         box.setStyle("-fx-padding: 10,10,10,10;");
         ArtWork artwork = track.getArtwork();
         WaveForm waveForm = track.getWaveform();
         ImageView artwork_view = new ImageView();
-        Canvas wave_view = waveForm.getCanvas(waveWidth, waveHeigth);
+        artwork_view.setFitWidth(artWidth);
+        artwork_view.setFitHeight(artHeight);
+        Canvas wave_view = waveForm.getCanvas(waveWidth, waveHeight);
 
 
-        asyncArtworkAdd(artwork_view, artwork, artWidth, artHeigth);
+        asyncArtworkAdd(artwork_view, artwork, artWidth, artHeight);
 
         artwork_view.setOnMouseClicked(mouseEvent -> setTrack(track, list));
         wave_view.setOnMouseClicked(mouseEvent -> setTrack(track, list));
@@ -87,12 +89,14 @@ public class UIUtils {
     public static BorderPane buildTrackTile(Track track,
                                             PagedList<Track> list,
                                             int artWidth,
-                                            int artHeigth) {
+                                            int artHeight) {
         BorderPane box = new BorderPane();
         ArtWork artwork = track.getArtwork();
         ImageView artwork_view = new ImageView();
+        artwork_view.setFitWidth(artWidth);
+        artwork_view.setFitHeight(artHeight);
 
-        asyncArtworkAdd(artwork_view, artwork, artWidth, artHeigth);
+        asyncArtworkAdd(artwork_view, artwork, artWidth, artHeight);
 
         artwork_view.setOnMouseClicked(mouseEvent -> setTrack(track, list));
 
@@ -108,6 +112,8 @@ public class UIUtils {
         BorderPane box = new BorderPane();
         ArtWork artwork = playList.getArtwork();
         ImageView artwork_view = new ImageView();
+        artwork_view.setFitWidth(width);
+        artwork_view.setFitHeight(heigth);
 
         asyncArtworkAdd(artwork_view, artwork, width, heigth);
 

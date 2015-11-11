@@ -44,6 +44,9 @@ public class Track {
             if (jsonObject.has("origin")) {
                 long id = jsonObject.getJSONObject("origin").getLong("id");
                 jsonObject = RequestManager.getJSON(String.format(Endpoints.TRACK_DETAILS, id));
+            } else if (jsonObject.has("track")) {
+                jsonObject = RequestManager.getJSON(String.format(Endpoints.TRACK_DETAILS,
+                        jsonObject.getJSONObject("track").getInt("id")));
             }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
@@ -52,7 +55,8 @@ public class Track {
             title = jsonObject.getString("title");
             uri = jsonObject.getString("uri");
             permalink_url = jsonObject.getString("permalink_url");
-            stream_url = jsonObject.getString("stream_url");
+            if (jsonObject.getBoolean("streamable"))
+                stream_url = jsonObject.getString("stream_url");
             duration = jsonObject.getInt("duration");
             waveform = new WaveForm(jsonObject.getString("waveform_url"));
             String artwork_url = jsonObject.getString("artwork_url");

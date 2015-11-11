@@ -1,7 +1,9 @@
 package firenox.ui;
 
+import firenox.logger.Logger;
 import firenox.model.PagedList;
 import firenox.model.Track;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -15,6 +17,7 @@ import javafx.scene.layout.VBox;
  */
 public class TracksPane extends BorderPane {
 
+    private Logger log = Logger.getLogger(getClass().getName());
     private final int waveWidth = 650;
     private final int waveHeigth = 80;
     private final int artWidth = 100;
@@ -24,9 +27,7 @@ public class TracksPane extends BorderPane {
     public TracksPane(PagedList<Track> favList) {
         if (defaultMode == DisplayMode.List) {
             setCenter(buildListView(favList));
-        }
-        else
-        {
+        } else {
             setCenter(buildTileView(favList));
         }
 
@@ -49,9 +50,11 @@ public class TracksPane extends BorderPane {
                         favList.loadNextEntries();
                     }
                 });
+        requestLayout();
     }
 
     private Node buildListView(PagedList<Track> favList) {
+        System.out.println("TracksPane.buildListView");
         VBox vbox = new VBox();
 
         //build Track container for list view
@@ -59,15 +62,17 @@ public class TracksPane extends BorderPane {
                 t, favList, waveWidth, waveHeigth, artWidth, artHeigth)));
 
         //update container on list changes
-        favList.setNewEntriesLoadedListener(() ->
-                favList.getLastLoadedEntries().forEach(t -> vbox.getChildren().add(UIUtils.buildTrackContainer(
-                        t, favList, waveWidth, waveHeigth, artWidth, artHeigth))));
+        favList.setNewEntriesLoadedListener(list ->
+                Platform.runLater(() ->
+                        list.forEach(t ->
+                                vbox.getChildren().add(UIUtils.buildTrackContainer(
+                                        (Track) t, favList, waveWidth, waveHeigth, artWidth, artHeigth)))));
         return vbox;
     }
 
     private TilePane buildTileView(PagedList<Track> favList) {
         TilePane tilePane = new TilePane();
-        tilePane.setPadding(new Insets(5,5,5,5));
+        tilePane.setPadding(new Insets(5, 5, 5, 5));
         tilePane.setHgap(10);
         tilePane.setVgap(10);
 
@@ -82,8 +87,7 @@ public class TracksPane extends BorderPane {
         tilePane.setPadding(new Insets(5, hgap, 5, hgap));
 
         UIManager.getController().getMainScrollPane().widthProperty().addListener(
-                (observable, oldValue, newValue) ->
-                {
+                (observable, oldValue, newValue) -> {
                     int newColums = newValue.intValue() / (width + 20);
                     int newHgap = (newValue.intValue() % (width + 20)) / (colums + 1);
                     tilePane.setPrefColumns(newColums);
@@ -97,9 +101,11 @@ public class TracksPane extends BorderPane {
                 t, favList, width, heigth)));
 
         //update container on list changes
-        favList.setNewEntriesLoadedListener(() ->
-                favList.getLastLoadedEntries().forEach(t -> tilePane.getChildren().add(UIUtils.buildTrackTile(
-                        t, favList, width, heigth))));
+        favList.setNewEntriesLoadedListener(list ->
+                Platform.runLater(() ->
+                        list.forEach(t ->
+                                tilePane.getChildren().add(
+                                        UIUtils.buildTrackTile((Track) t, favList, width, heigth)))));
         return tilePane;
     }
 }
