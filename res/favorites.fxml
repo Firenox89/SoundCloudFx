@@ -108,13 +108,13 @@
             <children>
             <Button fx:id="profileButton" mnemonicParsing="false" onAction="#handleProfileButton" text="Profile" />
             <Button fx:id="streamButton" mnemonicParsing="false" onAction="#handleStreamButton" text="Stream" />
-            <Button fx:id="playerButton" mnemonicParsing="false" onAction="#handlePlayerButton" text="Player" />
+            <!--Button fx:id="playerButton" mnemonicParsing="false" onAction="#handlePlayerButton" text="Player" /-->
                 <Button fx:id="playlistButton" mnemonicParsing="false" onAction="#handlePlaylistButton" text="Playlists" />
                 <Button fx:id="likesButton" mnemonicParsing="false" onAction="#handleLikesButton" text="Likes" />
             </children>
         </FlowPane>
     </top>
-    <center>
-        <ScrollPane fx:id="mainScrollPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-    </center>
+   <center>
+      <ScrollPane fx:id="mainScrollPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" styleClass="edge-to-edge"/>
+   </center>
 </BorderPane>

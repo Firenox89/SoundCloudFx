@@ -48,20 +48,20 @@ public class BackgroundLoader extends Thread {
         }
     }
 
-    public static void addTaskWithtimeout(Runnable task, int timeout)
+    public static void addTaskWithTimeout(Runnable task, int timeout)
     {
         Future future = executor.submit(() -> task.run());
         try {
             future.get(timeout, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
+            //apache client hangs up, reinit wrapper
+            //should be done in the api wrapper
+            LogInHandler.init();
+            addTaskWithTimeout(task, timeout);
             log.e(e);
-            //retry
-            addTaskWithtimeout(task, timeout);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.e(e);
         }
     }
 

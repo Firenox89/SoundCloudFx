@@ -3,6 +3,8 @@ package firenox.model;
 import com.soundcloud.api.Endpoints;
 import firenox.io.RequestManager;
 import firenox.logger.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +24,7 @@ public class ModelManager {
     public static String WAVE_CACHE_PATH = CACHE_PATH + File.separator + "waves";
     private static HashMap<String, User> userList = new HashMap<>();
     private static HashMap<String, Track> trackList = new HashMap<>();
-    private static ModelManager instance = new ModelManager();
+    private static HashMap<String, PlayList> playlistsList = new HashMap<>();
     private static Logger log = Logger.getLogger(ModelManager.class.getName());
 
     static {
@@ -40,34 +42,8 @@ public class ModelManager {
     private ModelManager() {
     }
 
-    public static User getUser(String url) {
-        User user = userList.get(url);
-
-        if (user == null) {
-            user = instance.loadUser(url);
-            userList.put(url, user);
-        }
-        return user;
-    }
-
-    public static User getUser(int id) {
-        return getUser(String.format(Endpoints.USER_DETAILS, id));
-    }
-
     public static User getMe() {
         return getUser(Endpoints.MY_DETAILS);
-    }
-
-    public static Track getTrack(String name) {
-        Track track = null;
-
-        track = trackList.get(name);
-
-        if (track == null) {
-            track = instance.loadTrack(name);
-            trackList.put(name, track);
-        }
-        return track;
     }
 
     public static PagedList<Track> getMyLikes() {
@@ -82,15 +58,108 @@ public class ModelManager {
         return getMe().getPlaylists();
     }
 
-    public User loadUser(String url) {
+    public static PagedList<Track> getMyStream() {
+        return getMe().getStream();
+    }
+
+    public static User getUser(String url) {
+        User user = userList.get(url);
+
+        if (user == null) {
+            user = loadUser(url);
+            userList.put(url, user);
+        }
+        return user;
+    }
+
+    public static Track getTrack(String name) {
+        Track track = trackList.get(name);
+
+        if (track == null) {
+            track = loadTrack(name);
+            trackList.put(name, track);
+        }
+        return track;
+    }
+
+    public static PlayList getPlaylist(String name) {
+        PlayList playList = playlistsList.get(name);
+
+        if (playList == null)
+        {
+            playList = loadPlaylist(name);
+            playlistsList.put(name, playList);
+        }
+        return playList;
+    }
+
+    public static User getUser(int id) {
+        return getUser(String.format(Endpoints.USER_DETAILS, id));
+    }
+
+    public static Track getTrack(int id) {
+        return getTrack(String.format(Endpoints.TRACK_DETAILS, id));
+    }
+
+    public static PlayList getPlayList(int id) {
+        return getPlaylist(String.format(Endpoints.PLAYLIST_DETAILS, id));
+    }
+
+    public static Track getTrack(JSONObject jsonObject) throws JSONException {
+        if (jsonObject.has("origin")) {
+            //response from activities api
+            //to less info
+            int id = jsonObject.getJSONObject("origin").getInt("id");
+            return getTrack(id);
+        } else if (jsonObject.has("track")) {
+            //response from repost api
+            //does not contain the stream_url
+            int id = jsonObject.getJSONObject("track").getInt("id");
+            return getTrack(id);
+        }
+        String trackUrl = String.format(Endpoints.TRACK_DETAILS, jsonObject.getInt("id"));
+
+        Track track = trackList.get(trackUrl);
+
+        if (track == null) {
+            track = new Track(jsonObject);
+            trackList.put(trackUrl, track);
+        }
+        return track;
+    }
+
+    public static PlayList getPlaylist(JSONObject jsonObject) throws JSONException {
+        if (jsonObject.has("origin")) {
+            int id = jsonObject.getJSONObject("origin").getInt("id");
+            return getPlayList(id);
+        }
+
+        String playlistUrl = String.format(Endpoints.TRACK_DETAILS, jsonObject.getInt("id"));
+
+        PlayList playList = playlistsList.get(playlistUrl);
+
+        if (playList == null) {
+            playList = new PlayList(jsonObject);
+            playlistsList.put(playlistUrl, playList);
+        }
+        return playList;
+    }
+
+    public static Comment getComment(JSONObject jsonObject) {
+        //there is no api point to load them
+        //and the list is inside the track they belong to
+        return new Comment(jsonObject);
+    }
+
+    private static User loadUser(String url) {
         return new User(RequestManager.getJSON(url));
     }
 
-    public Track loadTrack(String name) {
+    private static Track loadTrack(String name) {
         return new Track(RequestManager.getJSON(name));
     }
 
-    public static PagedList<Track> getStream() {
-        return getMe().getStream();
+    private static PlayList loadPlaylist(String name) {
+        return new PlayList(RequestManager.getJSON(name));
     }
 }

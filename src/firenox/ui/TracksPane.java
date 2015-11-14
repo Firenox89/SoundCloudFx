@@ -19,12 +19,13 @@ public class TracksPane extends BorderPane {
 
     private Logger log = Logger.getLogger(getClass().getName());
     private final int waveWidth = 650;
-    private final int waveHeigth = 80;
+    private final int waveHeigth = 70;
     private final int artWidth = 100;
     private final int artHeigth = 100;
     private DisplayMode defaultMode = DisplayMode.List;
 
     public TracksPane(PagedList<Track> favList) {
+
         if (defaultMode == DisplayMode.List) {
             setCenter(buildListView(favList));
         } else {

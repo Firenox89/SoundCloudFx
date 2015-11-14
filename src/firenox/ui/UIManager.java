@@ -40,6 +40,7 @@ public class UIManager {
         controller = loader.getController();
         AudioManager.getPlayerFx().bindVolume(controller.getVolumeSlider().valueProperty());
         Scene scene = new Scene(root, 800, 600);
+        scene.getStylesheets().add("style.css");
 
         stage.setScene(scene);
         stage.show();
@@ -80,7 +81,7 @@ public class UIManager {
 
     public static void showStream() {
         if (streamPane == null) {
-            streamPane = new TracksPane(ModelManager.getStream());
+            streamPane = new TracksPane(ModelManager.getMyStream());
         }
         getController().getMainScrollPane().setContent(streamPane);
     }
@@ -91,6 +92,10 @@ public class UIManager {
 
     public static void showUser(User user) {
         getController().getMainScrollPane().setContent(new UserPane(user));
+    }
+
+    public static void showTrack(Track track) {
+        getController().getMainScrollPane().setContent(new TrackPane(track));
     }
 
     public static void setTrackForPlayerUI(Track track, PagedList<Track> playlist) {
@@ -107,6 +112,7 @@ public class UIManager {
             DecimalFormat secondFormater = new DecimalFormat("00");
 
             controller.getTitleLabel().setText(track.getTitle());
+            controller.getTitleLabel().setOnMouseClicked(event -> showTrack(track));
             controller.getUserLabel().setText(track.getUser_name());
             controller.getUserLabel().setOnMouseClicked(event -> showUser(track.getUser()));
             controller.getProgressSlider().setMax(duration);

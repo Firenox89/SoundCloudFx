@@ -1,5 +1,6 @@
 package firenox.media;
 
+import com.sun.media.jfxmedia.MediaManager;
 import firenox.io.BackgroundLoader;
 import firenox.logger.Logger;
 import firenox.model.PagedList;
@@ -62,27 +63,35 @@ public class AudioPlayerFx implements IAudioPlayer {
     }
 
     public void open(Track track) {
-        BackgroundLoader.addTaskWithtimeout(() ->
-        {
-            currentTrack = track;
-            String url = track.getStreamURL();
+        try {
+            if (MediaManager.canPlayProtocol("https"))
+                BackgroundLoader.addTaskWithTimeout(() ->
+                {
+                    currentTrack = track;
+                    String url = track.getStreamURL();
 
-            log.d("open: " + url);
-            currentMedia = new Media(url);
-            stop();
+                    log.d("open: " + url);
+                    currentMedia = new Media(url);
+                    stop();
 
-            player = new MediaPlayer(currentMedia);
+                    player = new MediaPlayer(currentMedia);
 
-            player.volumeProperty().bindBidirectional(volumeSliderProb);
-            volumeSliderProb.setValue(defaultVolume);
-            player.setOnEndOfMedia(this::next);
-            //TODO: append listener to new player
+                    player.volumeProperty().bindBidirectional(volumeSliderProb);
+                    volumeSliderProb.setValue(defaultVolume);
+                    player.setOnEndOfMedia(this::next);
+                    //TODO: append listener to new player
 
-            player.play();
-            isPlaying = true;
+                    player.play();
+                    isPlaying = true;
 
-            UIManager.setTrackForPlayerUI(currentTrack, currentPlaylist);
-        }, 5*1000);
+                    UIManager.setTrackForPlayerUI(currentTrack, currentPlaylist);
+                }, 3 * 1000);
+        } catch (NoSuchMethodError error) {
+            //the support came together with that method
+            String version = com.sun.javafx.runtime.VersionInfo.getRuntimeVersion();
+            log.e("JavaFx version does not support https protocol");
+            log.e("Min version = 8.0.72. Current version "+version);
+        }
     }
 
     public void open(PagedList<Track> playlist, int startIndex) {
@@ -116,10 +125,23 @@ public class AudioPlayerFx implements IAudioPlayer {
                 int current = currentPlaylist.indexOf(currentTrack);
                 if (repeat) {
                     open(currentPlaylist.get(current));
-                } else if (currentPlaylist.size() > current) {
+                } else if (currentPlaylist.size() > current + 1) {
                     open(currentPlaylist.get(++current));
                 } else {
-                    log.d("end of list");
+
+                    //try to load new entries
+                    currentPlaylist.loadNextEntries();
+                    //TODO: create temp listener
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (currentPlaylist.size() > current + 1) {
+                        open(currentPlaylist.get(++current));
+                    } else {
+                        log.d("end of list");
+                    }
                 }
             }
         }

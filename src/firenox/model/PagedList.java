@@ -64,14 +64,20 @@ public class PagedList<E> extends ArrayList<E> {
                         } else {
                             kind = jsonArray.getJSONObject(i).getString("type");
                         }
-                        if ((type == Track.class && (kind.equals("track") || kind.equals("track-repost")))
-                                //apparently a track repost is called track-repost
-                                //and a playlist repost is called playlist
-                                || type == PlayList.class && kind.equals("playlist")) {
-                            E entire = type.getConstructor(JSONObject.class).newInstance(jsonArray.getJSONObject(i));
-                            newEntries.add(entire);
+                        if (type == Track.class && (kind.equals("track") || kind.equals("track-repost"))) {
+                            //apparently a track repost is called track-repost
+                            E entry = (E) ModelManager.getTrack(jsonArray.getJSONObject(i));
+                            newEntries.add(entry);
+                        }
+                        else if (type == PlayList.class && kind.equals("playlist")) {
+                            //and a playlist repost is called playlist
+                            E entry = (E) ModelManager.getPlaylist(jsonArray.getJSONObject(i));
+                            newEntries.add(entry);
+                        } else if (type == Comment.class && kind.equals("comment")) {
+                            E entry = (E) ModelManager.getComment(jsonArray.getJSONObject(i));
+                            newEntries.add(entry);
                         } else {
-                            log.d("Kind-Type mismatch kind = " + kind + "type " + type.getName());
+                            log.d("Kind-Type mismatch kind = " + kind + " type =" + type.getName());
 //                            if (kind.equals("playlist"))
 //                                log.e(Http.formatJSON(json));
                         }
@@ -90,15 +96,7 @@ public class PagedList<E> extends ArrayList<E> {
                     log.e(e);
                     log.e("url = " + url);
                     log.e("next_href = " + next_href);
-                    log.e(Http.formatJSON(json));
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    log.e("json =\n" + Http.formatJSON(json));
                 }
             }
         }
@@ -106,7 +104,7 @@ public class PagedList<E> extends ArrayList<E> {
 
     @Override
     public E get(int index) {
-        if ((index / size()) >= 0.90) {
+        if ((size() - index) < 2) {
             log.d("get next");
             loadNextEntries();
         }

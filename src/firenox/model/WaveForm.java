@@ -38,6 +38,10 @@ public class WaveForm extends CacheableImage {
         return waveRender.renderToFxCanvas();
     }
 
+    public void resetProgress()
+    {
+        //TODO: fill me
+    }
     public void progressAnimation(double progress) {
         rendererList.forEach((s, waveRenderer) -> waveRenderer.renderProgress(progress));
     }

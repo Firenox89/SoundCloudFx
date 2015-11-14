@@ -41,6 +41,7 @@ public class UserPane extends VBox {
                     new Label("TODO: Put more infos into this space and format it")
 
             );
+            pane.setStyle("-fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #dc143c, #661a33)");
             bPane.setCenter(pane);
 
             getChildren().add(bPane);
@@ -52,6 +53,8 @@ public class UserPane extends VBox {
             PlaylistPane playlistPane = new PlaylistPane(user.getPlaylists());
 
             TabPane tabPane = new TabPane();
+            //TODO: do that dynamic
+            tabPane.setMinWidth(800);
             Tab playlistsTab = new Tab("Playlists", playlistPane);
             playlistsTab.setClosable(false);
 

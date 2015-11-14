@@ -15,7 +15,7 @@ public class TrackTab extends Tab {
 
     private Logger log = Logger.getLogger(getClass().getName());
     private final int waveWidth = 650;
-    private final int waveHeigth = 80;
+    private final int waveHeigth = 70;
     private final int artWidth = 100;
     private final int artHeigth = 100;
     private final String name;
@@ -38,7 +38,6 @@ public class TrackTab extends Tab {
 
     private Node buildListView(PagedList<Track> trackList) {
         VBox vbox = new VBox();
-
 
         //update container on list changes
         trackList.setNewEntriesLoadedListener(list ->

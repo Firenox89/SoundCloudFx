@@ -19,20 +19,22 @@ import java.io.*;
  * Created by firenox on 10/6/15.
  */
 public class Track {
-    Logger log = Logger.getLogger(getClass().getName());
-    int id;
-    int user_id;
-    String title;
-    String permalink;
-    String uri;
-    String permalink_url;
-    ArtWork artwork;
-    String stream_url;
-    int duration;
-    WaveForm waveform;
+    private Logger log = Logger.getLogger(getClass().getName());
+    private int id;
+    private int user_id;
+    private String title;
+    private String permalink;
+    private String uri;
+    private String permalink_url;
+    private ArtWork artwork;
+    private String stream_url;
+    private int duration;
+    private WaveForm waveform;
     private JSONObject jsonObject;
     private User user;
     private String user_name;
+    private PagedList<Comment> comments;
+    private int LIMIT = 10;
 
     public Track(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
@@ -41,13 +43,6 @@ public class Track {
 
     private void parseJSON(JSONObject jsonObject) {
         try {
-            if (jsonObject.has("origin")) {
-                long id = jsonObject.getJSONObject("origin").getLong("id");
-                jsonObject = RequestManager.getJSON(String.format(Endpoints.TRACK_DETAILS, id));
-            } else if (jsonObject.has("track")) {
-                jsonObject = RequestManager.getJSON(String.format(Endpoints.TRACK_DETAILS,
-                        jsonObject.getJSONObject("track").getInt("id")));
-            }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
             user_name = jsonObject.getJSONObject("user").getString("username");
@@ -170,6 +165,13 @@ public class Track {
             user = ModelManager.getUser(user_id);
         }
         return user;
+    }
+
+    public PagedList<Comment> getComments() {
+        if (comments == null) {
+            comments = new PagedList<Comment>(String.format(Endpoints.TRACK_COMMENTS, id), LIMIT, Comment.class);
+        }
+        return comments;
     }
 
     public String getUser_name() {

@@ -32,25 +32,29 @@ public class UIUtils {
                                                  int artWidth,
                                                  int artHeight) {
         BorderPane box = new BorderPane();
-        box.setStyle("-fx-padding: 10,10,10,10;");
+        box.setStyle("-fx-padding: 5, 5, 5, 5;");
         ArtWork artwork = track.getArtwork();
         WaveForm waveForm = track.getWaveform();
         ImageView artwork_view = new ImageView();
         artwork_view.setFitWidth(artWidth);
         artwork_view.setFitHeight(artHeight);
         Canvas wave_view = waveForm.getCanvas(waveWidth, waveHeight);
+        Label title = new Label(track.getTitle());
+        Label userName = new Label(track.getUser_name());
 
 
         asyncArtworkAdd(artwork_view, artwork, artWidth, artHeight);
 
         artwork_view.setOnMouseClicked(mouseEvent -> setTrack(track, list));
         wave_view.setOnMouseClicked(mouseEvent -> setTrack(track, list));
+        title.setOnMouseClicked(event -> UIManager.showTrack(track));
+        userName.setOnMouseClicked(event -> UIManager.showUser(track.getUser()));
 
         box.setLeft(artwork_view);
         VBox wave_con = new VBox();
         wave_con.setStyle("-fx-alignment: center;");
-        Label label = new Label(track.getTitle());
-        wave_con.getChildren().add(label);
+        wave_con.getChildren().add(userName);
+        wave_con.getChildren().add(title);
         wave_con.getChildren().add(wave_view);
         box.setCenter(wave_con);
 

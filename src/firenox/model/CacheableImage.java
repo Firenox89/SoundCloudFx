@@ -44,10 +44,21 @@ public abstract class CacheableImage {
         }
 //        FileOutputStream fos = new FileOutputStream(fileToCache);
 
+        if (is == null)
+            is = new FileInputStream(new File(getFallbackUrl()));
         //read in image to check for image corruption
         BufferedImage bi = ImageIO.read(is);
 
-        ImageIO.write(bi, "jpg", fileToCache);
+        String imageType;
+        if (url.endsWith(".png")) {
+            imageType = "png";
+        } else if (url.endsWith(".jpg")) {
+            imageType = "jpg";
+        } else {
+            throw new IllegalStateException("Unsupported image type. url = " + url);
+        }
+
+        ImageIO.write(bi, imageType, fileToCache);
 
 //        byte[] buffer = new byte[1024];
 //        int read;

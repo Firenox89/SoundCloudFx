@@ -31,11 +31,6 @@ public class PlayList {
 
     private void parseJSON(JSONObject jsonObject) {
         try {
-
-            if (jsonObject.has("origin")) {
-                long id = jsonObject.getJSONObject("origin").getLong("id");
-                jsonObject = RequestManager.getJSON("/playlists/" + id);
-            }
             id = jsonObject.getInt("id");
             user_id = jsonObject.getInt("user_id");
             permalink = jsonObject.getString("permalink");
@@ -98,7 +93,7 @@ public class PlayList {
 
     public PagedList<Track> getTrackList() {
         if (tracks == null) {
-            tracks = new PagedList<Track>(String.format(Endpoints.PLAYLIST_TRACKS, id), LIMIT, Track.class);
+            tracks = new PagedList<>(String.format(Endpoints.PLAYLIST_TRACKS, id), LIMIT, Track.class);
         }
         return tracks;
     }

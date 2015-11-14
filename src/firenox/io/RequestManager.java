@@ -45,7 +45,12 @@ public class RequestManager {
      */
     public static HttpResponse request(String request) throws IOException {
         LogInHandler.checkInit();
-        return wrapper.get(Request.to(request));
+        HttpResponse resp = wrapper.get(Request.to(request));
+        if (resp.getStatusLine().getStatusCode() != 200)
+        {
+            log.d(resp.getStatusLine());
+        }
+        return resp;
     }
 
     /**
@@ -95,6 +100,7 @@ public class RequestManager {
     public static HttpResponse requestPlayListsWithLimit(String requestUrl, int limit, int page) throws IOException {
         //TODO: check if that is a playlist request
         Request request;
+        log.d("requestPlaylist = " + requestUrl);
         if (page == 0) {
             request = Request.to(requestUrl).add("limit", limit).add("representation", "compact");
         } else {
@@ -114,7 +120,7 @@ public class RequestManager {
     public static Stream requestStream(String request) throws IOException {
         //TODO: check if that is a playlist request
         LogInHandler.checkInit();
-        log.d("request = " + request);
+        log.d("requestStream = " + request);
         //TODO: do this with a timeout since it hangs from time to time
         return wrapper.resolveStreamUrl(request, false);
     }
@@ -128,8 +134,13 @@ public class RequestManager {
      */
     public static InputStream getResource(String url) throws IOException {
         HttpResponse response = requestResource(url);
-        HttpEntity entity = response.getEntity();
-        InputStream is = entity.getContent();
+        InputStream is = null;
+        if (response.getStatusLine().getStatusCode() == 200) {
+            HttpEntity entity = response.getEntity();
+            is = entity.getContent();
+        } else {
+            log.d("url = "+url+" response Status = "+response.getStatusLine());
+        }
 
         return is;
     }
@@ -151,7 +162,7 @@ public class RequestManager {
     public static String getStringWithLimit(String requestUrl, int limit, int page) {
         String string = null;
         try {
-            if (requestUrl.contains("playlists")) {
+            if (requestUrl.endsWith("playlists")) {
                 string = Http.getString(requestPlayListsWithLimit(requestUrl, limit, page));
             } else if (requestUrl.contains("reposts")) {
                 int userId = Integer.parseInt(requestUrl.substring(7, requestUrl.length() - 8));

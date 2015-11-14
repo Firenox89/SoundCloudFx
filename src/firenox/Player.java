@@ -1,6 +1,7 @@
 package firenox;
 
 import com.soundcloud.api.Endpoints;
+import com.soundcloud.api.Request;
 import firenox.io.BackgroundLoader;
 import firenox.io.Http;
 import firenox.io.LogInHandler;
@@ -14,7 +15,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+//import jxgrabkey.HotkeyConflictException;
+//import jxgrabkey.HotkeyListener;
+//import jxgrabkey.JXGrabKey;
 
+//import javax.swing.*;
+//import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
@@ -31,15 +37,29 @@ public class Player extends Application {
     public void start(Stage primaryStage) {
 //        testLogic();
 //        testScene(primaryStage);
+//        testLib();
 
         //should return true in the version I desire
         //MediaManager.canPlayProtocol("https");
 
         LogInHandler.init();
+//        testJson();
         BackgroundLoader.init();
         UIManager.init(primaryStage);
     }
 
+    private void testJson()
+    {
+        String url = "/playlists/152900381/tracks";
+        try {
+            String resp = Http.formatJSON(Http.getString(RequestManager.request(
+                    Request.to(url).add("representation", "id")
+            )));
+            System.out.println("resp = " + resp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void testLogic() {
         File testDir = new File("/home/firenox/IdeaProjects/SoundCloudPlayer/src/firenox/ui");
         Map<String, File> list =
@@ -53,6 +73,60 @@ public class Player extends Application {
     private void testLink() {
         System.out.println(Http.formatJSON(RequestManager.getString(Endpoints.MY_FAVORITES)));
     }
+    boolean hotkeyEventReceived;
+
+//    private void testLib() {
+//        int index = 15;
+//        //Load JXGrabKey lib
+//        try {
+//            System.load(new File("/media/firenox/X/git/SoundCloudFx/lib/jxgrabkey-0.3.2/lib/libJXGrabKey.so").getCanonicalPath());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //Enable Debug Output
+//        JXGrabKey.setDebugOutput(true);
+//
+//        //Register some Hotkey
+//        try {
+//
+//            int key = KeyEvent.VK_K, mask = KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK | KeyEvent.SHIFT_MASK;
+////            int key = KeyEvent.VK_F2, mask = KeyEvent.ALT_MASK; //Conflicts on GNOME
+//
+//            JXGrabKey.getInstance().registerAwtHotkey(index, mask, key);
+//        } catch (HotkeyConflictException e) {
+//            JOptionPane.showMessageDialog(null, e.getMessage(), e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+//
+//            JXGrabKey.getInstance().cleanUp(); //Automatically unregisters Hotkeys and Listeners
+//            //Alternatively, just unregister the key causing this or leave it as it is
+//            //the key may not be grabbed at all or may not respond when numlock, capslock or scrollock is on
+//            return;
+//        }
+//
+//        //Implement HotkeyListener
+//        HotkeyListener hotkeyListener = hotkey_idx -> {
+//            System.out.println("hotkey_idx = " + hotkey_idx);
+//            hotkeyEventReceived = true;
+//        };
+//
+//        //Add HotkeyListener
+//        JXGrabKey.getInstance().addHotkeyListener(hotkeyListener);
+//
+//        //Wait for Hotkey Event
+//        while (!hotkeyEventReceived) {
+//            try {
+//                Thread.sleep(1000);
+//                System.out.println("wait");
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        // Shutdown JXGrabKey
+//        JXGrabKey.getInstance().unregisterHotKey(1); //Optional
+//        JXGrabKey.getInstance().removeHotkeyListener(hotkeyListener); //Optional
+//        JXGrabKey.getInstance().cleanUp();
+//    }
 
     private void testScene(Stage stage) {
 
@@ -74,20 +148,4 @@ public class Player extends Application {
 
     }
 
-    private void saveStream(InputStream inputStream, String filePath) {
-        try {
-            FileOutputStream fos = new FileOutputStream(new File(filePath));
-            int read = 0;
-            byte[] buffer = new byte[1024 * 4];
-            while ((read = inputStream.read(buffer)) != -1) {
-                fos.write(buffer);
-                Traffic.addMP3Traffic(read);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 }

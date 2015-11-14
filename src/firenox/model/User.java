@@ -117,17 +117,15 @@ public class User {
         return playLists;
     }
 
-    public PagedList<Track> getTracks()
-    {
+    public PagedList<Track> getTracks() {
         if (tracks == null) {
             tracks = new PagedList<>(String.format(Endpoints.USER_TRACKS, id), LIMIT, Track.class);
         }
         return tracks;
     }
 
-    public PagedList<Track> getReposts(){
-        if (reposts == null)
-        {
+    public PagedList<Track> getReposts() {
+        if (reposts == null) {
             reposts = new PagedList<>(String.format(RequestManager.USER_REPOSTS, id), LIMIT, Track.class);
         }
         return reposts;
