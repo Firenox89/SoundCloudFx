@@ -49,6 +49,7 @@ public class RequestManager {
         if (resp.getStatusLine().getStatusCode() != 200)
         {
             log.d(resp.getStatusLine());
+            resp = null;
         }
         return resp;
     }
@@ -184,12 +185,17 @@ public class RequestManager {
      */
     public static String getString(String requestUrl) {
         String string = null;
+        HttpResponse resp;
         try {
             //TODO: should be handled in the soundcloud api wrapper
             if (requestUrl.startsWith("https://api-v2")) {
-                string = Http.getString(requestResource(requestUrl));
+                resp = requestResource(requestUrl);
+                if (resp != null)
+                    string = Http.getString(resp);
             } else {
-                string = Http.getString(request(requestUrl));
+                resp = request(requestUrl);
+                if (resp != null)
+                    string = Http.getString(resp);
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -46,7 +46,6 @@ public class UserPane extends VBox {
 
             getChildren().add(bPane);
 
-
             TrackTab repostTab = new TrackTab("Reposts", user.getReposts());
             TrackTab tracksTab = new TrackTab("Tracks", user.getTracks());
             TrackTab likesTab = new TrackTab("Likes", user.getLikes());

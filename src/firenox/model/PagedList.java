@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
@@ -50,48 +49,52 @@ public class PagedList<E> extends ArrayList<E> {
                     } else {
                         json = RequestManager.getString(next_href);
                         //clear the href for the next round
+                        if (json == null)
+                            log.e("Bad response for: " + next_href);
                         next_href = null;
                     }
-                    JSONObject response = new JSONObject(json);
-                    JSONArray jsonArray = response.getJSONArray("collection");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        String kind;
-                        if (jsonArray.getJSONObject(i).has("origin")) {
-                            //that's the case from stream
-                            kind = jsonArray.getJSONObject(i).getJSONObject("origin").getString("kind");
-                        } else if (jsonArray.getJSONObject(i).has("kind")) {
-                            kind = jsonArray.getJSONObject(i).getString("kind");
-                        } else {
-                            kind = jsonArray.getJSONObject(i).getString("type");
-                        }
-                        if (type == Track.class && (kind.equals("track") || kind.equals("track-repost"))) {
-                            //apparently a track repost is called track-repost
-                            E entry = (E) ModelManager.getTrack(jsonArray.getJSONObject(i));
-                            newEntries.add(entry);
-                        }
-                        else if (type == PlayList.class && kind.equals("playlist")) {
-                            //and a playlist repost is called playlist
-                            E entry = (E) ModelManager.getPlaylist(jsonArray.getJSONObject(i));
-                            newEntries.add(entry);
-                        } else if (type == Comment.class && kind.equals("comment")) {
-                            E entry = (E) ModelManager.getComment(jsonArray.getJSONObject(i));
-                            newEntries.add(entry);
-                        } else {
-                            log.d("Kind-Type mismatch kind = " + kind + " type =" + type.getName());
+                    if (json != null) {
+
+                        JSONObject response = new JSONObject(json);
+                        JSONArray jsonArray = response.getJSONArray("collection");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            String kind;
+                            if (jsonArray.getJSONObject(i).has("origin")) {
+                                //that's the case from stream
+                                kind = jsonArray.getJSONObject(i).getJSONObject("origin").getString("kind");
+                            } else if (jsonArray.getJSONObject(i).has("kind")) {
+                                kind = jsonArray.getJSONObject(i).getString("kind");
+                            } else {
+                                kind = jsonArray.getJSONObject(i).getString("type");
+                            }
+                            if (type == Track.class && (kind.equals("track") || kind.equals("track-repost"))) {
+                                //apparently a track repost is called track-repost
+                                E entry = (E) ModelManager.getTrack(jsonArray.getJSONObject(i));
+                                newEntries.add(entry);
+                            } else if (type == PlayList.class && kind.equals("playlist")) {
+                                //and a playlist repost is called playlist
+                                E entry = (E) ModelManager.getPlaylist(jsonArray.getJSONObject(i));
+                                newEntries.add(entry);
+                            } else if (type == Comment.class && kind.equals("comment")) {
+                                E entry = (E) ModelManager.getComment(jsonArray.getJSONObject(i));
+                                newEntries.add(entry);
+                            } else {
+                                log.d("Kind-Type mismatch kind = " + kind + " type =" + type.getName());
 //                            if (kind.equals("playlist"))
 //                                log.e(Http.formatJSON(json));
+                            }
                         }
-                    }
-                    if (response.has("next_href")) {
-                        next_href = response.getString("next_href");
-                    }
-                    if (next_href == null) {
-                        allLoaded = true;
-                    }
-                    addAll(newEntries);
+                        if (response.has("next_href")) {
+                            next_href = response.getString("next_href");
+                        }
+                        if (next_href == null) {
+                            allLoaded = true;
+                        }
+                        addAll(newEntries);
 
-                    final ArrayList<E> finalNewEntries = newEntries;
-                    listeners.forEach(listener -> listener.entriesChanged(finalNewEntries));
+                        final ArrayList<E> finalNewEntries = newEntries;
+                        listeners.forEach(listener -> listener.entriesChanged(finalNewEntries));
+                    }
                 } catch (JSONException e) {
                     log.e(e);
                     log.e("url = " + url);

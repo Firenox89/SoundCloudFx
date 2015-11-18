@@ -30,6 +30,7 @@ public class PlaylistPane extends BorderPane {
 
     private TilePane buildTileView(PagedList<PlayList> playLists) {
         TilePane tilePane = new TilePane();
+        tilePane.getStyleClass().add("style.css");
         tilePane.setPadding(new Insets(5, 5, 5, 5));
         tilePane.setHgap(10);
         tilePane.setVgap(10);

@@ -45,7 +45,8 @@ public class UIManager {
         stage.setScene(scene);
         stage.show();
 
-        showProfile();
+//        showProfile();
+        showFavorites();
     }
 
     public static FXMLController getController() {

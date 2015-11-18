@@ -1,5 +1,6 @@
 package firenox.model;
 
+import com.soundcloud.api.CloudAPI;
 import com.soundcloud.api.Endpoints;
 import com.soundcloud.api.Stream;
 import firenox.io.Http;
@@ -28,6 +29,7 @@ public class Track {
     private String permalink_url;
     private ArtWork artwork;
     private String stream_url;
+    private boolean streamable;
     private int duration;
     private WaveForm waveform;
     private JSONObject jsonObject;
@@ -50,7 +52,8 @@ public class Track {
             title = jsonObject.getString("title");
             uri = jsonObject.getString("uri");
             permalink_url = jsonObject.getString("permalink_url");
-            if (jsonObject.getBoolean("streamable"))
+            streamable = jsonObject.getBoolean("streamable");
+            if (streamable)
                 stream_url = jsonObject.getString("stream_url");
             duration = jsonObject.getInt("duration");
             waveform = new WaveForm(jsonObject.getString("waveform_url"));
@@ -61,15 +64,6 @@ public class Track {
             }
             artwork = new ArtWork(artwork_url);
 
-            log.i("title " + title);
-            log.i("id " + id);
-            log.i("user_id " + user_id);
-            log.i("permalink " + permalink);
-            log.i("uri " + uri);
-            log.i("permalink_url " + permalink_url);
-            log.i("stream_url " + stream_url);
-            log.i("duration " + duration);
-            log.i("waveform " + waveform);
         } catch (JSONException e) {
             log.e(e);
             log.e(Http.formatJSON(jsonObject.toString()));
@@ -132,6 +126,10 @@ public class Track {
         Stream stream = null;
         try {
             stream = RequestManager.requestStream(stream_url);
+        } catch (CloudAPI.ResolverException e) {
+            log.e("streamable = "+streamable);
+            log.e("stream_url = "+stream_url);
+            log.e(e);
         } catch (IOException e) {
             e.printStackTrace();
         }

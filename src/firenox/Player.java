@@ -6,6 +6,7 @@ import firenox.io.BackgroundLoader;
 import firenox.io.Http;
 import firenox.io.LogInHandler;
 import firenox.io.RequestManager;
+import firenox.model.ModelManager;
 import firenox.statistics.Traffic;
 import firenox.ui.UIManager;
 import firenox.ui.WaveRenderer;
@@ -50,10 +51,12 @@ public class Player extends Application {
 
     private void testJson()
     {
-        String url = "/playlists/152900381/tracks";
+        int track_id = 232639165;
+        int me_id = ModelManager.getMe().getId();
+        String url = "/users/"+me_id+"/favorites/"+track_id;
         try {
             String resp = Http.formatJSON(Http.getString(RequestManager.request(
-                    Request.to(url).add("representation", "id")
+                    Request.to(url)
             )));
             System.out.println("resp = " + resp);
         } catch (IOException e) {
