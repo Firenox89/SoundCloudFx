@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by firenox on 10/8/15.
  */
-public class TracksPane extends BorderPane {
+public class TracksPane extends BorderPane implements PlayerPane {
 
     private Logger log = Logger.getLogger(getClass().getName());
     private final int waveWidth = 650;
@@ -23,56 +23,77 @@ public class TracksPane extends BorderPane {
     private final int artWidth = 100;
     private final int artHeigth = 100;
     private DisplayMode defaultMode = DisplayMode.List;
+    private PagedList<Track> trackList;
+    private TilePane tilePane;
 
-    public TracksPane(PagedList<Track> favList) {
+    public TracksPane(PagedList<Track> trackList) {
 
+        this.trackList = trackList;
         if (defaultMode == DisplayMode.List) {
-            setCenter(buildListView(favList));
+            setCenter(buildListView());
         } else {
-            setCenter(buildTileView(favList));
+            setCenter(buildTileView());
         }
 
         FlowPane flowPane = new FlowPane();
         Button listButton = new Button("List");
-        listButton.setOnAction(event -> setCenter(buildListView(favList)));
+        listButton.setOnAction(event -> setCenter(buildListView()));
         Button tileButton = new Button("Tile");
-        tileButton.setOnAction(event -> setCenter(buildTileView(favList)));
+        tileButton.setOnAction(event -> setCenter(buildTileView()));
 
         flowPane.getChildren().add(listButton);
         flowPane.getChildren().add(tileButton);
 
         setTop(flowPane);
 
-        //if viewport reaches the bottom, request new tracks
-        UIManager.getController().getMainScrollPane().vvalueProperty().addListener(
-                (observable, oldValue, newValue) ->
-                {
-                    if (newValue.doubleValue() > 0.98) {
-                        favList.loadNextEntries();
-                    }
-                });
         requestLayout();
     }
 
-    private Node buildListView(PagedList<Track> favList) {
-        System.out.println("TracksPane.buildListView");
+    @Override
+    public void setListener() {
+        //if viewport reaches the bottom, request new tracks
+        UIManager.addViewportVListener(
+                (observable, oldValue, newValue) ->
+                {
+                    double trackListSize = trackList.size();
+                    double d = (trackListSize - 3) / trackListSize;
+                    if (newValue.doubleValue() > d) {
+                        trackList.loadNextEntries();
+                    }
+                });
+
+        if (tilePane != null) {
+            UIManager.addWidthListener(
+                    (observable, oldValue, newValue) -> {
+                        int width = artWidth * 2;
+                        int columns = newValue.intValue() / (width + 20);
+                        int hgap = (newValue.intValue() % (width + 20)) / (columns + 1);
+                        tilePane.setPrefColumns(columns);
+                        tilePane.setHgap(hgap);
+                        tilePane.setPadding(new Insets(5, hgap, 5, hgap));
+                        tilePane.requestLayout();
+                    });
+        }
+    }
+
+    private Node buildListView() {
         VBox vbox = new VBox();
 
         //build Track container for list view
-        favList.forEach(t -> vbox.getChildren().add(UIUtils.buildTrackContainer(
-                t, favList, waveWidth, waveHeigth, artWidth, artHeigth)));
+        trackList.forEach(t -> vbox.getChildren().add(UIUtils.buildTrackContainer(
+                t, trackList, waveWidth, waveHeigth, artWidth, artHeigth)));
 
         //update container on list changes
-        favList.setNewEntriesLoadedListener(list ->
+        trackList.setNewEntriesLoadedListener(list ->
                 Platform.runLater(() ->
                         list.forEach(t ->
                                 vbox.getChildren().add(UIUtils.buildTrackContainer(
-                                        (Track) t, favList, waveWidth, waveHeigth, artWidth, artHeigth)))));
+                                        (Track) t, trackList, waveWidth, waveHeigth, artWidth, artHeigth)))));
         return vbox;
     }
 
-    private TilePane buildTileView(PagedList<Track> favList) {
-        TilePane tilePane = new TilePane();
+    private TilePane buildTileView() {
+        tilePane = new TilePane();
         tilePane.setPadding(new Insets(5, 5, 5, 5));
         tilePane.setHgap(10);
         tilePane.setVgap(10);
@@ -80,33 +101,24 @@ public class TracksPane extends BorderPane {
         int width = artWidth * 2;
         int heigth = artHeigth * 2;
 
-        int panelWidth = (int) UIManager.getController().getMainScrollPane().getWidth();
+        int panelWidth = (int) UIManager.getWidth();
         int colums = panelWidth / (width + 20);
         int hgap = (panelWidth % (width + 20)) / (colums + 1);
         tilePane.setPrefColumns(colums);
         tilePane.setHgap(hgap);
         tilePane.setPadding(new Insets(5, hgap, 5, hgap));
 
-        UIManager.getController().getMainScrollPane().widthProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    int newColums = newValue.intValue() / (width + 20);
-                    int newHgap = (newValue.intValue() % (width + 20)) / (colums + 1);
-                    tilePane.setPrefColumns(newColums);
-                    tilePane.setHgap(newHgap);
-                    tilePane.setPadding(new Insets(5, newHgap, 5, newHgap));
-                    tilePane.requestLayout();
-                });
 
         //build Track container for list view
-        favList.forEach(t -> tilePane.getChildren().add(UIUtils.buildTrackTile(
-                t, favList, width, heigth)));
+        trackList.forEach(t -> tilePane.getChildren().add(UIUtils.buildTrackTile(
+                t, trackList, width, heigth)));
 
         //update container on list changes
-        favList.setNewEntriesLoadedListener(list ->
+        trackList.setNewEntriesLoadedListener(list ->
                 Platform.runLater(() ->
                         list.forEach(t ->
                                 tilePane.getChildren().add(
-                                        UIUtils.buildTrackTile((Track) t, favList, width, heigth)))));
+                                        UIUtils.buildTrackTile((Track) t, trackList, width, heigth)))));
         return tilePane;
     }
 }

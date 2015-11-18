@@ -4,10 +4,7 @@ import firenox.logger.Logger;
 import firenox.model.Comment;
 import firenox.model.PagedList;
 import firenox.model.Track;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -18,17 +15,21 @@ import java.io.IOException;
 /**
  * Created by firenox on 11/11/15.
  */
-public class TrackPane extends VBox {
+public class TrackPane extends VBox implements PlayerPane{
     private final Track track;
     private Logger log = Logger.getLogger(getClass().getName());
     private final int avatar_width = 200;
     private final int avatar_height = 200;
     private Image avatar;
-    private String name;
 
     public TrackPane(Track track) {
         this.track = track;
         createDetails();
+    }
+
+    @Override
+    public void setListener() {
+
     }
 
     private void createDetails() {

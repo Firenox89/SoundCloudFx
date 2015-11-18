@@ -1,23 +1,17 @@
 UI
     Menu...
     Search bar
-    More Scenes -> Player, User, Tracks, ...
     Symbols for volume and repeat
-    Tile display for playlists, user...
     Buttons for like, repost, add to playlist, share
     Stats traffic, playback
-    History
+    Track/Playlist History
     Notification
     Keyboard shortcuts
     Tags
-    Comments
-    Put styling into css files
     Equalizer
 
 Logic
     UI corresponding things
-    Rename & Refactor LogInHandler
-    Models for playlist
     Follower/Following
     Serialization of tracks, user...
 

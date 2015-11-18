@@ -40,19 +40,15 @@ public class FXMLController {
     }
 
     @FXML public void handlePlaylistButton(ActionEvent actionEvent) {
-        UIManager.showPlaylists();
+        UIManager.showMyPlaylists();
     }
 
     @FXML public void handleLikesButton(ActionEvent actionEvent) {
-        UIManager.showFavorites();
-    }
-
-    @FXML public void handlePlayerButton(ActionEvent actionEvent) {
-        UIManager.showPlayer();
+        UIManager.showMyLikes();
     }
 
     @FXML public void handleStreamButton(ActionEvent actionEvent) {
-        UIManager.showStream();
+        UIManager.showMyStream();
     }
 
     @FXML public void handleProfileButton(ActionEvent actionEvent) {
@@ -97,5 +93,9 @@ public class FXMLController {
 
     public void handleRepeat(ActionEvent actionEvent) {
         AudioManager.getPlayerFx().toggleRepeat();
+    }
+
+    public void handleBackButton(ActionEvent actionEvent) {
+        UIManager.back();
     }
 }

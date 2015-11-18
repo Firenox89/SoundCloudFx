@@ -2,7 +2,10 @@ package firenox.ui;
 
 import firenox.logger.Logger;
 import firenox.model.User;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
@@ -14,7 +17,7 @@ import java.io.IOException;
 /**
  * Created by firenox on 10/8/15.
  */
-public class UserPane extends VBox {
+public class UserPane extends VBox implements PlayerPane{
 
     private Logger log = Logger.getLogger(getClass().getName());
     private final int avatar_width = 200;
@@ -22,10 +25,22 @@ public class UserPane extends VBox {
     private User user;
     private Image avatar;
     private String name;
+    private TrackTab repostTab;
+    private TrackTab tracksTab;
+    private PlaylistPane playlistPane;
+    private TrackTab likesTab;
 
     public UserPane(User user) {
         this.user = user;
         createDetails();
+    }
+
+    @Override
+    public void setListener() {
+        repostTab.setListener();
+        tracksTab.setListener();
+        playlistPane.setListener();
+        likesTab.setListener();
     }
 
     private void createDetails() {
@@ -41,15 +56,14 @@ public class UserPane extends VBox {
                     new Label("TODO: Put more infos into this space and format it")
 
             );
-            pane.setStyle("-fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #dc143c, #661a33)");
             bPane.setCenter(pane);
 
             getChildren().add(bPane);
 
-            TrackTab repostTab = new TrackTab("Reposts", user.getReposts());
-            TrackTab tracksTab = new TrackTab("Tracks", user.getTracks());
-            TrackTab likesTab = new TrackTab("Likes", user.getLikes());
-            PlaylistPane playlistPane = new PlaylistPane(user.getPlaylists());
+            repostTab = new TrackTab("Reposts", user.getReposts());
+            tracksTab = new TrackTab("Tracks", user.getTracks());
+            likesTab = new TrackTab("Likes", user.getLikes());
+            playlistPane = new PlaylistPane(user.getPlaylists());
 
             TabPane tabPane = new TabPane();
             //TODO: do that dynamic

@@ -120,7 +120,7 @@ public class RequestManager {
      */
     public static Stream requestStream(String request) throws IOException {
         //TODO: check if that is a playlist request
-        LogInHandler.checkInit();
+        LogInHandler.checkToken();
         log.d("requestStream = " + request);
         //TODO: do this with a timeout since it hangs from time to time
         return wrapper.resolveStreamUrl(request, false);

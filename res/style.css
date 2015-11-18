@@ -2,8 +2,8 @@
    -fx-background-color: #999999;
    -fx-background-insets: 0;
    -fx-padding: 0;
-    -fx-spacing: 0;
-    -fx-border-width: 0px;
+   -fx-spacing: 0;
+   -fx-border-width: 0px;
 }
 
 .tab-pane {

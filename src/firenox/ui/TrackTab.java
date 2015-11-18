@@ -18,25 +18,29 @@ public class TrackTab extends Tab {
     private final int waveHeigth = 70;
     private final int artWidth = 100;
     private final int artHeigth = 100;
-    private final String name;
+    private PagedList<Track> trackList;
 
-    public TrackTab(String name, PagedList<Track> favList) {
+    public TrackTab(String name, PagedList<Track> trackList) {
         super(name);
-        this.name = name;
+        this.trackList = trackList;
         setClosable(false);
-        setContent(buildListView(favList));
+        setContent(buildListView());
+    }
 
+    public void setListener() {
         //if viewport reaches the bottom, request new tracks
-        UIManager.getController().getMainScrollPane().vvalueProperty().addListener(
+        UIManager.addViewportVListener(
                 (observable, oldValue, newValue) ->
                 {
-                    if (newValue.doubleValue() > 0.98) {
-                        favList.loadNextEntries();
+                    double trackListSize = trackList.size();
+                    double d = (trackListSize-3)/trackListSize;
+                    if (newValue.doubleValue() > d) {
+                        trackList.loadNextEntries();
                     }
                 });
     }
 
-    private Node buildListView(PagedList<Track> trackList) {
+    private Node buildListView() {
         VBox vbox = new VBox();
 
         //update container on list changes
@@ -59,4 +63,5 @@ public class TrackTab extends Tab {
         }
         return vbox;
     }
+
 }

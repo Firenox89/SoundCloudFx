@@ -1,20 +1,11 @@
 package firenox.io;
 
 import com.soundcloud.api.ApiWrapper;
-import com.soundcloud.api.Request;
-import com.soundcloud.api.Stream;
 import com.soundcloud.api.Token;
 import firenox.logger.Logger;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
 
@@ -24,6 +15,7 @@ import java.util.Properties;
 public class LogInHandler {
     private static final File WRAPPER_SER = new File("wrapper.ser");
     private static Properties credentials = new Properties();
+
     static {
         try {
             credentials.load(LogInHandler.class.getClassLoader().getResourceAsStream("credentials.properties"));
@@ -31,6 +23,7 @@ public class LogInHandler {
             e.printStackTrace();
         }
     }
+
     private static String CLIENT_ID = credentials.getProperty("client.id");
     private static String CLIENT_SECRET = credentials.getProperty("client.secret");
     private static String DEFAULT_LOGIN = credentials.getProperty("default.login");
@@ -108,5 +101,13 @@ public class LogInHandler {
         System.out.println("got token from server: " + token);
 
         return wrapper;
+    }
+
+    public static void checkToken() throws IOException {
+        if (wrapper.getToken().getExpiresIn().before(new Date())) {
+            wrapper.refreshToken();
+            log.d("Token refreshed valid until: " + wrapper.getToken().getExpiresIn());
+            wrapper.toFile(WRAPPER_SER);
+        }
     }
 }
