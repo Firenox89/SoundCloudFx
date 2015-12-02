@@ -3,6 +3,7 @@ package firenox.media;
 import com.sun.media.jfxmedia.MediaManager;
 import firenox.io.BackgroundLoader;
 import firenox.logger.Logger;
+import firenox.model.AbstractPagedListEntry;
 import firenox.model.PagedList;
 import firenox.model.Track;
 import firenox.ui.UIManager;
@@ -21,15 +22,13 @@ public class AudioPlayerFx implements IAudioPlayer {
     Media currentMedia;
     MediaPlayer player;
     private boolean isPlaying = false;
-    private double defaultVolume = 0.2;
     private Property<Number> volumeSliderProb;
     private Runnable nextHandler;
     private Runnable previousHandler;
-    private PagedList<Track> currentPlaylist;
+    private PagedList<AbstractPagedListEntry> currentPlaylist;
     private boolean repeat = false;
     private boolean shuffle = false;
     private Track currentTrack;
-
 
     AudioPlayerFx() {
     }
@@ -62,22 +61,22 @@ public class AudioPlayerFx implements IAudioPlayer {
         }
     }
 
-    public void open(Track track) {
+    public void open(AbstractPagedListEntry track) {
         try {
             if (MediaManager.canPlayProtocol("https"))
                 BackgroundLoader.addTaskWithTimeout(() ->
                 {
-                    currentTrack = track;
-                    String url = track.getStreamURL();
+                    currentTrack = (Track) track;
+                    String url = currentTrack.getStreamURL();
 
                     log.d("open: " + url);
                     currentMedia = new Media(url);
                     stop();
 
+                    currentTrack.getWaveform().resetProgress();
                     player = new MediaPlayer(currentMedia);
 
                     player.volumeProperty().bindBidirectional(volumeSliderProb);
-                    volumeSliderProb.setValue(defaultVolume);
                     player.setOnEndOfMedia(this::next);
                     //TODO: append listener to new player
 
@@ -94,15 +93,13 @@ public class AudioPlayerFx implements IAudioPlayer {
         }
     }
 
-    public void open(PagedList<Track> playlist, int startIndex) {
+    public void open(PagedList<AbstractPagedListEntry> playlist, int startIndex) {
         currentPlaylist = playlist;
         open(currentPlaylist.get(startIndex));
     }
 
     @Override
     public void setVolume(double volume) {
-        log.d("volume = " + volume);
-        volumeSliderProb.setValue(volume);
     }
 
     public void bindVolume(Property<Number> volumeProb) {
@@ -110,7 +107,6 @@ public class AudioPlayerFx implements IAudioPlayer {
             player.volumeProperty().bindBidirectional(volumeProb);
         }
         volumeSliderProb = volumeProb;
-
     }
 
     @Override
@@ -128,7 +124,6 @@ public class AudioPlayerFx implements IAudioPlayer {
                 } else if (currentPlaylist.size() > current + 1) {
                     open(currentPlaylist.get(++current));
                 } else {
-
                     //try to load new entries
                     currentPlaylist.loadNextEntries();
                     //TODO: create temp listener
@@ -146,7 +141,6 @@ public class AudioPlayerFx implements IAudioPlayer {
             }
         }
     }
-
 
     @Override
     public void previous() {
@@ -170,7 +164,6 @@ public class AudioPlayerFx implements IAudioPlayer {
     @Override
     public void setPositon(double positon) {
         log.d("setPositon");
-
     }
 
     @Override
@@ -209,7 +202,8 @@ public class AudioPlayerFx implements IAudioPlayer {
         previousHandler = handler;
     }
 
-    public void seek() {
+    public void seek(Duration seekTime) {
+        player.seek(seekTime);
     }
 
 

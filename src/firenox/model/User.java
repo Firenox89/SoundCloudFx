@@ -32,12 +32,12 @@ public class User {
     private String uri;
     private String permalink_url;
     private ArtWork avatar;
-    private PagedList<Track> likesList;
+    private PagedList<AbstractPagedListEntry> likesList;
     private int LIMIT = 9;
-    private PagedList<Track> streamList;
+    private PagedList<AbstractPagedListEntry> streamList;
     private PagedList<PlayList> playLists;
-    private PagedList<Track> tracks;
-    private PagedList<Track> reposts;
+    private PagedList<AbstractPagedListEntry> tracks;
+    private PagedList<AbstractPagedListEntry> reposts;
 
     public User(JSONObject jsonObject) {
         parseJSON(jsonObject);
@@ -71,9 +71,9 @@ public class User {
         }
     }
 
-    public PagedList<Track> getLikes() {
+    public PagedList<AbstractPagedListEntry> getLikes() {
         if (likesList == null) {
-            likesList = new PagedList<>(String.format(Endpoints.USER_FAVORITES, id), LIMIT, Track.class);
+            likesList = new PagedList<>(String.format(Endpoints.USER_FAVORITES, id), LIMIT, AbstractPagedListEntry.class);
         }
         return likesList;
     }
@@ -102,9 +102,9 @@ public class User {
         return avatar_url;
     }
 
-    public PagedList<Track> getStream() {
+    public PagedList<AbstractPagedListEntry> getStream() {
         if (streamList == null) {
-            streamList = new PagedList<>(Endpoints.MY_ACTIVITIES, LIMIT, Track.class);
+            streamList = new PagedList<>(Endpoints.MY_ACTIVITIES, LIMIT, AbstractPagedListEntry.class);
         }
         return streamList;
     }
@@ -112,21 +112,21 @@ public class User {
     public PagedList<PlayList> getPlaylists() {
 
         if (playLists == null) {
-            playLists = new PagedList<>(String.format(Endpoints.USER_PLAYLISTS, id), LIMIT, PlayList.class);
+            playLists = new PagedList<>(String.format(Endpoints.USER_PLAYLISTS, id), 6, PlayList.class);
         }
         return playLists;
     }
 
-    public PagedList<Track> getTracks() {
+    public PagedList<AbstractPagedListEntry> getTracks() {
         if (tracks == null) {
-            tracks = new PagedList<>(String.format(Endpoints.USER_TRACKS, id), LIMIT, Track.class);
+            tracks = new PagedList<>(String.format(Endpoints.USER_TRACKS, id), LIMIT, AbstractPagedListEntry.class);
         }
         return tracks;
     }
 
-    public PagedList<Track> getReposts() {
+    public PagedList<AbstractPagedListEntry> getReposts() {
         if (reposts == null) {
-            reposts = new PagedList<>(String.format(RequestManager.USER_REPOSTS, id), LIMIT, Track.class);
+            reposts = new PagedList<>(String.format(RequestManager.USER_REPOSTS, id), LIMIT, AbstractPagedListEntry.class);
         }
         return reposts;
     }

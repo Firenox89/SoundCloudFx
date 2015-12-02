@@ -39,18 +39,30 @@ public class ModelManager {
         log.d("CACHE_PATH " + CACHE_PATH);
     }
 
-    private ModelManager() {
+    public static int getTrackCount()
+    {
+        return trackList.size();
+    }
+
+    public static int getUserCount()
+    {
+        return userList.size();
+    }
+
+    public static int getPlaylistCount()
+    {
+        return playlistsList.size();
     }
 
     public static User getMe() {
         return getUser(Endpoints.MY_DETAILS);
     }
 
-    public static PagedList<Track> getMyLikes() {
+    public static PagedList<AbstractPagedListEntry> getMyLikes() {
         return getMe().getLikes();
     }
 
-    public static PagedList<Track> getMyRepost() {
+    public static PagedList<AbstractPagedListEntry> getMyRepost() {
         return getMe().getReposts();
     }
 
@@ -58,7 +70,7 @@ public class ModelManager {
         return getMe().getPlaylists();
     }
 
-    public static PagedList<Track> getMyStream() {
+    public static PagedList<AbstractPagedListEntry> getMyStream() {
         return getMe().getStream();
     }
 
@@ -131,6 +143,12 @@ public class ModelManager {
     public static PlayList getPlaylist(JSONObject jsonObject) throws JSONException {
         if (jsonObject.has("origin")) {
             int id = jsonObject.getJSONObject("origin").getInt("id");
+            return getPlayList(id);
+        }
+        if (jsonObject.has("playlist"))
+        {
+            int id = jsonObject.getJSONObject("playlist").getInt("id");
+            //TODO: contains track list with ids should be used to load tracks lazily
             return getPlayList(id);
         }
 

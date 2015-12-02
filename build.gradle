@@ -7,6 +7,14 @@ version = '0.0.1'
 group   = 'firenox'
 mainClassName = "firenox.Player"
 
+defaultTasks 'jar'
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'firenox.Player'
+  }
+}
+
 sourceSets {
   main {
     java {
@@ -28,3 +36,7 @@ dependencies {
   compile group: 'com.mortennobel', name: 'java-image-scaling', version: '0.8.5'
 }
 
+task getDeps(type: Copy) {
+    from sourceSets.main.runtimeClasspath
+    into 'lib/'
+}

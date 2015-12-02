@@ -10,7 +10,7 @@ import org.json.JSONObject;
 /**
  * Created by firenox on 10/13/15.
  */
-public class PlayList {
+public class PlayList extends AbstractPagedListEntry {
     Logger log = Logger.getLogger(getClass().getName());
     int id;
     int user_id;
@@ -19,7 +19,7 @@ public class PlayList {
     String uri;
     String permalink_url;
     ArtWork artwork;
-    PagedList<Track> tracks;
+    PagedList<AbstractPagedListEntry> tracks;
     private JSONObject jsonObject;
     private User user;
     private int LIMIT = 10;
@@ -79,6 +79,19 @@ public class PlayList {
         return title;
     }
 
+    @Override
+    public String getUser_name() {
+        return getUser().getUsername();
+    }
+
+    @Override
+    public User getUser() {
+        if (user == null) {
+            user = ModelManager.getUser(user_id);
+        }
+        return user;
+    }
+
     public String getUri() {
         return uri;
     }
@@ -91,9 +104,15 @@ public class PlayList {
         return artwork;
     }
 
-    public PagedList<Track> getTrackList() {
+    @Override
+    public WaveForm getWaveform() {
+        //get wave from first track
+        return getTrackList().get(0).getWaveform();
+    }
+
+    public PagedList<AbstractPagedListEntry> getTrackList() {
         if (tracks == null) {
-            tracks = new PagedList<>(String.format(Endpoints.PLAYLIST_TRACKS, id), LIMIT, Track.class);
+            tracks = new PagedList<>(String.format(Endpoints.PLAYLIST_TRACKS, id), LIMIT, AbstractPagedListEntry.class);
         }
         return tracks;
     }

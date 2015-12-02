@@ -118,6 +118,7 @@
                 <Button fx:id="playlistButton" mnemonicParsing="false" onAction="#handlePlaylistButton"
                         text="Playlists"/>
                 <Button fx:id="likesButton" mnemonicParsing="false" onAction="#handleLikesButton" text="Likes"/>
+                <Button fx:id="statsButton" mnemonicParsing="false" onAction="#handleStatsButton" text="Statistics"/>
             </children>
         </FlowPane>
     </top>

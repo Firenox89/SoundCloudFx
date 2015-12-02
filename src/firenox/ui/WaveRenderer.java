@@ -121,7 +121,6 @@ public class WaveRenderer {
     }
 
     public void renderProgress(double progress) {
-
         GraphicsContext gc = canvasRender.getGraphicsContext2D();
 
         for (int i = 1; i <= stripNr * progress; i++) {
@@ -131,6 +130,20 @@ public class WaveRenderer {
             gc.fillRect(x, y, stripWidth, newHeight * 0.7 - y);
 
             gc.setFill(javafx.scene.paint.Color.CORAL);
+            gc.fillRect(x, newHeight * 0.7 + 1, stripWidth, (newHeight * 0.3) - (y * 0.3));
+        }
+    }
+
+    public void resetProgres() {
+        GraphicsContext gc = canvasRender.getGraphicsContext2D();
+
+        for (int i = 1; i <= stripNr; i++) {
+            double x = spacing * i + (stripWidth * i - 1);
+            double y = getFirstNonOpaquePixel((int) x);
+            gc.setFill(javafx.scene.paint.Color.LIGHTGRAY);
+            gc.fillRect(x, y, stripWidth, newHeight * 0.7 - y);
+
+            gc.setFill(javafx.scene.paint.Color.GRAY);
             gc.fillRect(x, newHeight * 0.7 + 1, stripWidth, (newHeight * 0.3) - (y * 0.3));
         }
     }

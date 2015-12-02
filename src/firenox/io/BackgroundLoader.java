@@ -39,6 +39,11 @@ public class BackgroundLoader extends Thread {
         taskQueue.add(task);
     }
 
+    public static void addTaskLimitQueue(Runnable task) {
+        if (taskQueue.size() < 3)
+            taskQueue.add(task);
+    }
+
     public static void addTaskWithNoQueue(Runnable task) {
         if (!singleExecuter.isRunning()) {
             synchronized (singleExecuter) {

@@ -1,8 +1,8 @@
 package firenox.ui;
 
 import firenox.logger.Logger;
+import firenox.model.AbstractPagedListEntry;
 import firenox.model.PagedList;
-import firenox.model.Track;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
@@ -18,13 +18,12 @@ public class TrackTab extends Tab {
     private final int waveHeigth = 70;
     private final int artWidth = 100;
     private final int artHeigth = 100;
-    private PagedList<Track> trackList;
+    private PagedList<AbstractPagedListEntry> trackList;
 
-    public TrackTab(String name, PagedList<Track> trackList) {
+    public TrackTab(String name, PagedList<AbstractPagedListEntry> trackList) {
         super(name);
         this.trackList = trackList;
         setClosable(false);
-        setContent(buildListView());
     }
 
     public void setListener() {
@@ -48,7 +47,12 @@ public class TrackTab extends Tab {
                 Platform.runLater(() -> {
                     list.forEach(t ->
                             vbox.getChildren().add(UIUtils.buildTrackContainer(
-                                    (Track) t, trackList, waveWidth, waveHeigth, artWidth, artHeigth)));
+                                    (AbstractPagedListEntry) t,
+                                    trackList,
+                                    waveWidth,
+                                    waveHeigth,
+                                    artWidth,
+                                    artHeigth)));
                     //tabs don't update their content automatically, silly tabs...
                     if (getTabPane() != null) {
                         getTabPane().requestLayout();
@@ -64,4 +68,11 @@ public class TrackTab extends Tab {
         return vbox;
     }
 
+    public void init() {
+        if (getContent() == null)
+        {
+            setContent(buildListView());
+        }
+        setListener();
+    }
 }

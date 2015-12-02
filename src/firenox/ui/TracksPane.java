@@ -1,6 +1,7 @@
 package firenox.ui;
 
 import firenox.logger.Logger;
+import firenox.model.AbstractPagedListEntry;
 import firenox.model.PagedList;
 import firenox.model.Track;
 import javafx.application.Platform;
@@ -23,30 +24,37 @@ public class TracksPane extends BorderPane implements PlayerPane {
     private final int artWidth = 100;
     private final int artHeigth = 100;
     private DisplayMode defaultMode = DisplayMode.List;
-    private PagedList<Track> trackList;
+    private PagedList<AbstractPagedListEntry> trackList;
     private TilePane tilePane;
 
-    public TracksPane(PagedList<Track> trackList) {
-
+    public TracksPane(PagedList<AbstractPagedListEntry> trackList) {
         this.trackList = trackList;
-        if (defaultMode == DisplayMode.List) {
-            setCenter(buildListView());
-        } else {
-            setCenter(buildTileView());
+    }
+
+    @Override
+    public void init() {
+        if (getCenter() == null)
+        {
+            if (defaultMode == DisplayMode.List) {
+                setCenter(buildListView());
+            } else {
+                setCenter(buildTileView());
+            }
+
+            FlowPane flowPane = new FlowPane();
+            Button listButton = new Button("List");
+            listButton.setOnAction(event -> setCenter(buildListView()));
+            Button tileButton = new Button("Tile");
+            tileButton.setOnAction(event -> setCenter(buildTileView()));
+
+            flowPane.getChildren().add(listButton);
+            flowPane.getChildren().add(tileButton);
+
+            setTop(flowPane);
+
+            requestLayout();
         }
-
-        FlowPane flowPane = new FlowPane();
-        Button listButton = new Button("List");
-        listButton.setOnAction(event -> setCenter(buildListView()));
-        Button tileButton = new Button("Tile");
-        tileButton.setOnAction(event -> setCenter(buildTileView()));
-
-        flowPane.getChildren().add(listButton);
-        flowPane.getChildren().add(tileButton);
-
-        setTop(flowPane);
-
-        requestLayout();
+        setListener();
     }
 
     @Override
@@ -88,7 +96,12 @@ public class TracksPane extends BorderPane implements PlayerPane {
                 Platform.runLater(() ->
                         list.forEach(t ->
                                 vbox.getChildren().add(UIUtils.buildTrackContainer(
-                                        (Track) t, trackList, waveWidth, waveHeigth, artWidth, artHeigth)))));
+                                        (AbstractPagedListEntry) t,
+                                        trackList,
+                                        waveWidth,
+                                        waveHeigth,
+                                        artWidth,
+                                        artHeigth)))));
         return vbox;
     }
 

@@ -33,7 +33,7 @@ public class PagedList<E> extends ArrayList<E> {
     }
 
     public void loadNextEntries() {
-        BackgroundLoader.addTask(() -> loadNextEntries(1));
+        BackgroundLoader.addTaskLimitQueue(() -> loadNextEntries(1));
     }
 
     private void loadNextEntries(int num) {
@@ -67,12 +67,12 @@ public class PagedList<E> extends ArrayList<E> {
                             } else {
                                 kind = jsonArray.getJSONObject(i).getString("type");
                             }
-                            if (type == Track.class && (kind.equals("track") || kind.equals("track-repost"))) {
-                                //apparently a track repost is called track-repost
+                            if ((type == Track.class || type == AbstractPagedListEntry.class)
+                                    && (kind.equals("track") || kind.equals("track-repost"))) {
                                 E entry = (E) ModelManager.getTrack(jsonArray.getJSONObject(i));
                                 newEntries.add(entry);
-                            } else if (type == PlayList.class && kind.equals("playlist")) {
-                                //and a playlist repost is called playlist
+                            } else if ((type == PlayList.class || type == AbstractPagedListEntry.class)
+                                    && kind.equals("playlist") || kind.equals("playlist-repost")) {
                                 E entry = (E) ModelManager.getPlaylist(jsonArray.getJSONObject(i));
                                 newEntries.add(entry);
                             } else if (type == Comment.class && kind.equals("comment")) {

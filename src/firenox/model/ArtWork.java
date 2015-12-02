@@ -1,6 +1,5 @@
 package firenox.model;
 
-import com.mortennobel.imagescaling.AdvancedResizeOp;
 import com.mortennobel.imagescaling.ResampleOp;
 import firenox.logger.Logger;
 
@@ -23,16 +22,17 @@ public class ArtWork extends CacheableImage {
     private final String urlT300;
     private final String urlLarge;
     private final String urlT67;
-    private final String urlFallBack = "/home/firenox/IdeaProjects/SoundCloudPlayer/src/firenox/ui/shinbuAva.png";
+    private final String urlFallback;
     private final boolean useFallback;
 
     public ArtWork(String url) {
+        urlFallback = getClass().getResource("/shinbuAva.png").getFile();
         if (url.equals("null")) {
-            urlLarge = urlFallBack;
-            urlT500 = urlFallBack;
-            urlCrop = urlFallBack;
-            urlT300 = urlFallBack;
-            urlT67 = urlFallBack;
+            urlLarge = urlFallback;
+            urlT500 = urlFallback;
+            urlCrop = urlFallback;
+            urlT300 = urlFallback;
+            urlT67 = urlFallback;
             useFallback = true;
         } else {
             urlLarge = url;
@@ -92,7 +92,7 @@ public class ArtWork extends CacheableImage {
 
     @Override
     protected String getFallbackUrl() {
-        return urlFallBack;
+        return urlFallback;
     }
 
     @Override

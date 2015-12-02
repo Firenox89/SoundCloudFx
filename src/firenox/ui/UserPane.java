@@ -32,15 +32,18 @@ public class UserPane extends VBox implements PlayerPane{
 
     public UserPane(User user) {
         this.user = user;
-        createDetails();
+    }
+
+    @Override
+    public void init() {
+        if (getChildren().size() == 0)
+            createDetails();
+        setListener();
     }
 
     @Override
     public void setListener() {
-        repostTab.setListener();
-        tracksTab.setListener();
-        playlistPane.setListener();
-        likesTab.setListener();
+        likesTab.init();
     }
 
     private void createDetails() {
@@ -54,7 +57,6 @@ public class UserPane extends VBox implements PlayerPane{
                     new Label(user.getUsername()),
                     new Label(user.getCity()+", "+user.getCountry()),
                     new Label("TODO: Put more infos into this space and format it")
-
             );
             bPane.setCenter(pane);
 
@@ -72,6 +74,16 @@ public class UserPane extends VBox implements PlayerPane{
             playlistsTab.setClosable(false);
 
             tabPane.getTabs().addAll(likesTab, tracksTab, playlistsTab, repostTab);
+            tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                UIManager.removeViewportVListeners();
+                if (newValue instanceof TrackTab)
+                {
+                    ((TrackTab) newValue).init();
+                }
+                else {
+                    playlistPane.init();
+                }
+            });
 
             getChildren().add(tabPane);
         } catch (IOException e) {

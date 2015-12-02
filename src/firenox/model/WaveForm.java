@@ -40,8 +40,9 @@ public class WaveForm extends CacheableImage {
 
     public void resetProgress()
     {
-        //TODO: fill me
+        rendererList.forEach((s, r) -> r.resetProgres());
     }
+
     public void progressAnimation(double progress) {
         rendererList.forEach((s, waveRenderer) -> waveRenderer.renderProgress(progress));
     }

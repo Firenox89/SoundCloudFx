@@ -98,4 +98,8 @@ public class FXMLController {
     public void handleBackButton(ActionEvent actionEvent) {
         UIManager.back();
     }
+
+    public void handleStatsButton(ActionEvent actionEvent) {
+        UIManager.showStats();
+    }
 }

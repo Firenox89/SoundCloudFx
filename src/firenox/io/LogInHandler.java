@@ -13,7 +13,7 @@ import java.util.Properties;
  * Created by firenox on 10/1/15.
  */
 public class LogInHandler {
-    private static final File WRAPPER_SER = new File("wrapper.ser");
+    private static final File WRAPPER_SER = new File(System.getProperty("java.io.tmpdir")+File.separator+"wrapper.ser");
     private static Properties credentials = new Properties();
 
     static {

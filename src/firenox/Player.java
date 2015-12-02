@@ -51,9 +51,10 @@ public class Player extends Application {
 
     private void testJson()
     {
-        int track_id = 232639165;
+        int track_id = 232639166;
         int me_id = ModelManager.getMe().getId();
-        String url = "/users/"+me_id+"/favorites/"+track_id;
+//        String url = "/users/"+me_id+"/favorites/"+track_id;
+        String url = "/me/favorites/"+track_id;
         try {
             String resp = Http.formatJSON(Http.getString(RequestManager.request(
                     Request.to(url)

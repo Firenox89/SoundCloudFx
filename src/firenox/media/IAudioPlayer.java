@@ -1,6 +1,6 @@
 package firenox.media;
 
-import firenox.model.Track;
+import firenox.model.AbstractPagedListEntry;
 
 /**
  * Created by firenox on 10/7/15.
@@ -12,7 +12,7 @@ interface IAudioPlayer {
 
     void stop();
 
-    void open(Track track);
+    void open(AbstractPagedListEntry track);
 
     void setVolume(double volume);
 

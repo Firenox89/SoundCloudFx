@@ -2,6 +2,7 @@ package firenox.model;
 
 import com.soundcloud.api.CloudAPI;
 import com.soundcloud.api.Endpoints;
+import com.soundcloud.api.Request;
 import com.soundcloud.api.Stream;
 import firenox.io.Http;
 import firenox.io.RequestManager;
@@ -19,7 +20,7 @@ import java.io.*;
 /**
  * Created by firenox on 10/6/15.
  */
-public class Track {
+public class Track extends AbstractPagedListEntry {
     private Logger log = Logger.getLogger(getClass().getName());
     private int id;
     private int user_id;
@@ -37,6 +38,7 @@ public class Track {
     private String user_name;
     private PagedList<Comment> comments;
     private int LIMIT = 10;
+    private int iLike = -1;
 
     public Track(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
@@ -105,6 +107,22 @@ public class Track {
 //        return stream_url;
 //    }
 
+    public boolean doILike() {
+        if (iLike == -1) {
+            String url = "/me/favorites/" + id;
+            try {
+                JSONObject resp = Http.getJSON(RequestManager.request(Request.to(url)));
+                if (resp.has("id")) {
+                    iLike = 1;
+                } else {
+                    iLike = 0;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return iLike == 1 ? true : false;
+    }
 
     public int getDuration() {
         return duration;
@@ -127,8 +145,8 @@ public class Track {
         try {
             stream = RequestManager.requestStream(stream_url);
         } catch (CloudAPI.ResolverException e) {
-            log.e("streamable = "+streamable);
-            log.e("stream_url = "+stream_url);
+            log.e("streamable = " + streamable);
+            log.e("stream_url = " + stream_url);
             log.e(e);
         } catch (IOException e) {
             e.printStackTrace();

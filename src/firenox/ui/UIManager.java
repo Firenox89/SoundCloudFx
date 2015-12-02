@@ -2,10 +2,7 @@ package firenox.ui;
 
 import firenox.logger.Logger;
 import firenox.media.AudioManager;
-import firenox.model.ModelManager;
-import firenox.model.PagedList;
-import firenox.model.Track;
-import firenox.model.User;
+import firenox.model.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
@@ -31,7 +28,7 @@ public class UIManager {
     private static TracksPane streamPane;
     private static PlaylistPane playlistPane;
     private static Track currentTrack;
-    private static PagedList<Track> currentPlaylist;
+    private static PagedList<AbstractPagedListEntry> currentPlaylist;
 
     public static void init(Stage stage) {
         try {
@@ -63,7 +60,7 @@ public class UIManager {
         controller.getMainScrollPane().setContent(node);
         //reset Viewport
         controller.getMainScrollPane().vvalueProperty().set(0);
-        ((PlayerPane) node).setListener();
+        ((PlayerPane) node).init();
     }
 
     public static void back() {
@@ -115,7 +112,7 @@ public class UIManager {
         setPane(likesPane);
     }
 
-    public static void showTrackList(PagedList<Track> tracks) {
+    public static void showTrackList(PagedList<AbstractPagedListEntry> tracks) {
         setPane(new TracksPane(tracks));
     }
 
@@ -145,7 +142,7 @@ public class UIManager {
         setPane(new TrackPane(track));
     }
 
-    public static void setTrackForPlayerUI(Track track, PagedList<Track> playlist) {
+    public static void setTrackForPlayerUI(Track track, PagedList<AbstractPagedListEntry> playlist) {
         Platform.runLater(() -> {
             currentTrack = track;
             currentPlaylist = playlist;
@@ -174,5 +171,13 @@ public class UIManager {
                 track.getWaveform().progressAnimation(newValue.toSeconds() / (track.getDuration() / 1000));
             });
         });
+    }
+
+    public static void showPlaylist(PlayList entry) {
+    //TODO: should look somewhat similar to the UserPane
+    }
+
+    public static void showStats() {
+        setPane(new StatsPane());
     }
 }

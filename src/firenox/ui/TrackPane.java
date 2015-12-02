@@ -24,7 +24,13 @@ public class TrackPane extends VBox implements PlayerPane{
 
     public TrackPane(Track track) {
         this.track = track;
-        createDetails();
+    }
+
+    @Override
+    public void init() {
+        if (getChildren().size() == 0)
+            createDetails();
+        setListener();
     }
 
     @Override

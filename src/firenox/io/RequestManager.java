@@ -6,6 +6,7 @@ import com.soundcloud.api.Stream;
 import firenox.logger.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
@@ -46,7 +47,7 @@ public class RequestManager {
     public static HttpResponse request(String request) throws IOException {
         LogInHandler.checkInit();
         HttpResponse resp = wrapper.get(Request.to(request));
-        if (resp.getStatusLine().getStatusCode() != 200)
+        if (resp.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
         {
             log.d(resp.getStatusLine());
             resp = null;
@@ -136,7 +137,7 @@ public class RequestManager {
     public static InputStream getResource(String url) throws IOException {
         HttpResponse response = requestResource(url);
         InputStream is = null;
-        if (response.getStatusLine().getStatusCode() == 200) {
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             HttpEntity entity = response.getEntity();
             is = entity.getContent();
         } else {
@@ -212,7 +213,9 @@ public class RequestManager {
     public static JSONObject getJSON(String requestUrl) {
         JSONObject jsonObject = null;
         try {
-            jsonObject = Http.getJSON(request(requestUrl));
+            HttpResponse resp = request(requestUrl);
+            if (resp != null)
+                jsonObject = Http.getJSON(resp);
         } catch (IOException e) {
             e.printStackTrace();
         }

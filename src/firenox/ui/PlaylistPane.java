@@ -20,7 +20,13 @@ public class PlaylistPane extends BorderPane implements PlayerPane {
 
     public PlaylistPane(PagedList<PlayList> playLists) {
         this.playLists = playLists;
-        setCenter(buildTileView());
+    }
+
+    @Override
+    public void init() {
+        if (getCenter() == null)
+            setCenter(buildTileView());
+        setListener();
     }
 
     @Override
