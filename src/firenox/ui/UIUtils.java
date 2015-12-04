@@ -51,7 +51,10 @@ public class UIUtils {
         asyncArtworkAdd(artwork_view, artwork, artWidth, artHeight);
 
         artwork_view.setOnMouseClicked(mouseEvent -> setTrack(entry, list));
-        wave_view.setOnMouseClicked(mouseEvent -> setTrack(entry, list));
+        wave_view.setOnMouseClicked(mouseEvent -> {
+            double s = mouseEvent.getX()/wave_view.getWidth();
+            AudioManager.getPlayerFx().openAndSeek(list, list.indexOf(entry), s);
+        });
         if (entry instanceof Track)
             title.setOnMouseClicked(event -> UIManager.showTrack((Track) entry));
         else if (entry instanceof PlayList)
@@ -61,10 +64,13 @@ public class UIUtils {
         SVGPath likeSVG = new SVGPath();
         likeSVG.setContent(likePath);
         likeSVG.setFillRule(FillRule.EVEN_ODD);
-        if (entry instanceof Track && ((Track)entry).doILike())        {
-            likeSVG.setFill(Color.CORAL);
-        }
-        else {
+        if (entry instanceof Track && ((Track) entry).doILike()) {
+            likeSVG.setFill(Color.ORANGE);
+            likeSVG.setOnMouseClicked(event -> toggleTrackLike((Track) entry, likeSVG));
+        } else if (entry instanceof Track) {
+            likeSVG.setFill(Color.GRAY);
+            likeSVG.setOnMouseClicked(event -> toggleTrackLike((Track) entry, likeSVG));
+        } else {
             likeSVG.setFill(Color.GRAY);
         }
 
@@ -122,6 +128,15 @@ public class UIUtils {
         return box;
     }
 
+    private static void toggleTrackLike(Track track, SVGPath path) {
+        if (track.doILike()) {
+            path.setFill(Color.GRAY);
+        } else {
+            path.setFill(Color.ORANGE);
+        }
+        track.toggleLike();
+    }
+
     private static void asyncArtworkAdd(ImageView view, ArtWork artWork, int width, int heigth) {
         BackgroundLoader.addTask(() ->
         {
@@ -150,6 +165,8 @@ public class UIUtils {
         else if (entry instanceof PlayList)
             AudioManager.getPlayerFx().open(((PlayList) entry).getTrackList(), 0);
     }
+
+
 
     public static BorderPane buildTrackTile(AbstractPagedListEntry track,
                                             PagedList<AbstractPagedListEntry> list,

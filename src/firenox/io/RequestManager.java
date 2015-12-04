@@ -221,4 +221,26 @@ public class RequestManager {
         }
         return jsonObject;
     }
+
+    public static HttpResponse likeTrack(int id) {
+        String url = "/me/favorites/" + id;
+        HttpResponse response = null;
+        try {
+            response = wrapper.put(Request.to(url).with("track[id]", id));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    public static HttpResponse unlikeTrack(int id) {
+        String url = "/me/favorites/" + id;
+        HttpResponse response = null;
+        try {
+            response = wrapper.delete(Request.to(url));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
 }

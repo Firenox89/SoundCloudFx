@@ -43,7 +43,7 @@ public class TrackTab extends Tab {
         VBox vbox = new VBox();
 
         //update container on list changes
-        trackList.setNewEntriesLoadedListener(list ->
+        trackList.addNewEntriesLoadedListener(list ->
                 Platform.runLater(() -> {
                     list.forEach(t ->
                             vbox.getChildren().add(UIUtils.buildTrackContainer(
@@ -62,6 +62,13 @@ public class TrackTab extends Tab {
         //build Track container for list view
         trackList.forEach(t -> vbox.getChildren().add(UIUtils.buildTrackContainer(
                 t, trackList, waveWidth, waveHeigth, artWidth, artHeigth)));
+        trackList.addEntryAddAt0Listener(() -> vbox.getChildren().add(0, UIUtils.buildTrackContainer(
+                trackList.get(0),
+                trackList,
+                waveWidth,
+                waveHeigth,
+                artWidth,
+                artHeigth)));
         if (getTabPane() != null) {
             getTabPane().requestLayout();
         }

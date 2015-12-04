@@ -207,4 +207,9 @@ public class AudioPlayerFx implements IAudioPlayer {
     }
 
 
+    public void openAndSeek(PagedList<AbstractPagedListEntry> list, int i, double s) {
+        open(list, i);
+        //wait for the player to load the meta data
+        player.setOnPlaying(() -> seek(new Duration(player.getTotalDuration().toMillis() * s)));
+    }
 }

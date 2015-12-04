@@ -124,6 +124,21 @@ public class Track extends AbstractPagedListEntry {
         return iLike == 1 ? true : false;
     }
 
+    public void toggleLike() {
+        if (iLike == -1) {
+            doILike();
+        }
+        if (iLike == 1) {
+            RequestManager.unlikeTrack(id);
+            iLike = 0;
+            ModelManager.getMe().getLikes().remove(this);
+        } else {
+            RequestManager.likeTrack(id);
+            iLike = 1;
+            ModelManager.getMe().getLikes().add(0, this);
+        }
+    }
+
     public int getDuration() {
         return duration;
     }

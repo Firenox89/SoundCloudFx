@@ -71,7 +71,7 @@ public class PlaylistPane extends BorderPane implements PlayerPane {
                 playList, artWidth, artHeigth)));
 
         //update container on list changes
-        playLists.setNewEntriesLoadedListener((list) ->
+        playLists.addNewEntriesLoadedListener((list) ->
                 Platform.runLater(() -> {
                     list.forEach(playList ->
                             tilePane.getChildren().add(

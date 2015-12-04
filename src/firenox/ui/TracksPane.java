@@ -92,7 +92,7 @@ public class TracksPane extends BorderPane implements PlayerPane {
                 t, trackList, waveWidth, waveHeigth, artWidth, artHeigth)));
 
         //update container on list changes
-        trackList.setNewEntriesLoadedListener(list ->
+        trackList.addNewEntriesLoadedListener(list ->
                 Platform.runLater(() ->
                         list.forEach(t ->
                                 vbox.getChildren().add(UIUtils.buildTrackContainer(
@@ -102,6 +102,13 @@ public class TracksPane extends BorderPane implements PlayerPane {
                                         waveHeigth,
                                         artWidth,
                                         artHeigth)))));
+        trackList.addEntryAddAt0Listener(() -> vbox.getChildren().add(0, UIUtils.buildTrackContainer(
+                trackList.get(0),
+                trackList,
+                waveWidth,
+                waveHeigth,
+                artWidth,
+                artHeigth)));
         return vbox;
     }
 
@@ -127,7 +134,7 @@ public class TracksPane extends BorderPane implements PlayerPane {
                 t, trackList, width, heigth)));
 
         //update container on list changes
-        trackList.setNewEntriesLoadedListener(list ->
+        trackList.addNewEntriesLoadedListener(list ->
                 Platform.runLater(() ->
                         list.forEach(t ->
                                 tilePane.getChildren().add(

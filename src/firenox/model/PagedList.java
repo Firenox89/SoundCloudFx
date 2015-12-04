@@ -22,7 +22,8 @@ public class PagedList<E> extends ArrayList<E> {
     private String next_href = null;
     private boolean allLoaded = false;
     private Logger log = Logger.getLogger(getClass().getName());
-    private ArrayList<EntriesChangedListener> listeners = new ArrayList<>();
+    private ArrayList<EntriesChangedListener> entriesChangedListeners = new ArrayList<>();
+    private ArrayList<EntryAddAt0Listener> entryAddedAt0Listeners = new ArrayList<>();
 
     public PagedList(String url, int limit, Class<E> type) {
         this.url = url;
@@ -59,7 +60,8 @@ public class PagedList<E> extends ArrayList<E> {
                         JSONArray jsonArray = response.getJSONArray("collection");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             String kind;
-                            if (jsonArray.getJSONObject(i).has("origin")) {
+                            if (jsonArray.getJSONObject(i).has("origin") &&
+                                    jsonArray.getJSONObject(i).get("origin") != null) {
                                 //that's the case from stream
                                 kind = jsonArray.getJSONObject(i).getJSONObject("origin").getString("kind");
                             } else if (jsonArray.getJSONObject(i).has("kind")) {
@@ -93,7 +95,7 @@ public class PagedList<E> extends ArrayList<E> {
                         addAll(newEntries);
 
                         final ArrayList<E> finalNewEntries = newEntries;
-                        listeners.forEach(listener -> listener.entriesChanged(finalNewEntries));
+                        entriesChangedListeners.forEach(listener -> listener.entriesChanged(finalNewEntries));
                     }
                 } catch (JSONException e) {
                     log.e(e);
@@ -114,13 +116,23 @@ public class PagedList<E> extends ArrayList<E> {
         return super.get(index);
     }
 
-    public void setNewEntriesLoadedListener(EntriesChangedListener listener) {
-        log.i("setNewEntriesLoadedListener");
-        listeners.add(listener);
+    @Override
+    public void add(int index, E element) {
+        super.add(index, element);
+        entryAddedAt0Listeners.forEach(EntryAddAt0Listener::entryAdded);
+    }
+
+    public void addEntryAddAt0Listener(EntryAddAt0Listener listener) {
+        entryAddedAt0Listeners.add(listener);
+    }
+
+    public void addNewEntriesLoadedListener(EntriesChangedListener listener) {
+        log.i("addNewEntriesLoadedListener");
+        entriesChangedListeners.add(listener);
     }
 
     public void removeListener(EntriesChangedListener listener) {
         log.i("removeListener");
-        listeners.remove(listener);
+        entriesChangedListeners.remove(listener);
     }
 }

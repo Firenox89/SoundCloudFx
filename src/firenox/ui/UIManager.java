@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -160,6 +161,11 @@ public class UIManager {
             controller.getUserLabel().setText(track.getUser_name());
             controller.getUserLabel().setOnMouseClicked(event -> showUser(track.getUser()));
             controller.getProgressSlider().setMax(duration);
+            controller.getProgressSlider().valueProperty().addListener((observable1, oldValue1, newValue1) ->
+            {
+                if (newValue1.intValue() - oldValue1.intValue() > 1 || oldValue1.intValue() > newValue1.intValue() && newValue1.intValue() != 0)
+                    AudioManager.getPlayerFx().seek(new Duration(newValue1.doubleValue()*1000));
+            });
 
             controller.getTrackTime().setText((duration / 60) + ":" + secondFormater.format(duration % 60));
 
