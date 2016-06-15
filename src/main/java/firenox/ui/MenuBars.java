@@ -3,9 +3,6 @@ package firenox.ui;
 import firenox.media.AudioManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -17,19 +14,15 @@ import javafx.scene.layout.VBox;
 public class MenuBars extends BorderPane {
 
 
+  public ScrollPane scrollPane = new ScrollPane();
   Slider progressSlider = new Slider();
-
   Slider volumeSlider = new Slider();
-
   ImageView titleView = new ImageView();
   Label artist = new Label("");
   Label track = new Label("");
-
   Label trackTime = new Label("00:00");
   Label currentTime = new Label("00:00");
-
   Button playButton = new Button();
-  public ScrollPane scrollPane = new ScrollPane();
 
   public MenuBars() {
     setTop(buildTopPane());
@@ -55,7 +48,7 @@ public class MenuBars extends BorderPane {
     streamButton.setOnMouseClicked(event -> UIManager.showMyStream());
 
     Button playlistButton = new Button("Playlists");
-    playButton.setOnMouseClicked(event -> UIManager.showMyPlaylists());
+    playlistButton.setOnMouseClicked(event -> UIManager.showMyPlaylists());
 
     Button likesButton = new Button("Likes");
     likesButton.setOnMouseClicked(event -> UIManager.showMyLikes());
@@ -71,12 +64,12 @@ public class MenuBars extends BorderPane {
     toolBar.setMinHeight(height);
     toolBar.setMaxHeight(height);
     toolBar.getItems().addAll(backButton,
-            profileButton,
-            streamButton,
-            playlistButton,
-            likesButton,
-            statisticsButton,
-            visualizerButton);
+        profileButton,
+        streamButton,
+        playlistButton,
+        likesButton,
+        statisticsButton,
+        visualizerButton);
 
     return toolBar;
   }
@@ -91,28 +84,28 @@ public class MenuBars extends BorderPane {
     bottom.setAlignment(Pos.CENTER);
 
     Button previousButton = new Button();
-    previousButton.setGraphic(UIUtils.SVGPaths.previous);
+    previousButton.setGraphic(UIUtils.SVGPaths.previous.get());
     previousButton.setOnMouseClicked(event -> AudioManager.getPlayerFx().previous());
 
     Button nextButton = new Button();
-    nextButton.setGraphic(UIUtils.SVGPaths.next);
+    nextButton.setGraphic(UIUtils.SVGPaths.next.get());
     nextButton.setOnMouseClicked(event -> AudioManager.getPlayerFx().next());
 
-    playButton.setGraphic(UIUtils.SVGPaths.pause);
+    playButton.setGraphic(UIUtils.SVGPaths.play.get());
     playButton.setOnMouseClicked(event -> AudioManager.getPlayerFx().play());
 
     Button repeatButton = new Button();
-    repeatButton.setGraphic(UIUtils.SVGPaths.repostPath);
+    repeatButton.setGraphic(UIUtils.SVGPaths.repostPath.get());
     repeatButton.setOnMouseClicked(event -> AudioManager.getPlayerFx().toggleRepeat());
 
     Button shuffleButton = new Button();
-    shuffleButton.setGraphic(UIUtils.SVGPaths.shuffle);
+    shuffleButton.setGraphic(UIUtils.SVGPaths.shuffle.get());
     shuffleButton.setOnMouseClicked(event -> AudioManager.getPlayerFx().toggleShuffle());
 
     volumeSlider.setMax(1);
     volumeSlider.setValue(0.2);
     MenuButton volumeButton = new MenuButton();
-    volumeButton.setGraphic(UIUtils.SVGPaths.volumeSpeaker);
+    volumeButton.setGraphic(UIUtils.SVGPaths.volumeSpeaker.get());
     volumeButton.getItems().add(new CustomMenuItem(volumeSlider));
 
 
@@ -120,14 +113,14 @@ public class MenuBars extends BorderPane {
     artistTrackBox.getChildren().addAll(artist, track);
 
     bottom.getChildren().addAll(previousButton,
-            playButton,
-            nextButton,
-            repeatButton,
-            shuffleButton,
-            progressSlider,
-            volumeButton,
-            titleView,
-            artistTrackBox);
+        playButton,
+        nextButton,
+        repeatButton,
+        shuffleButton,
+        progressSlider,
+        volumeButton,
+        titleView,
+        artistTrackBox);
 
     return bottom;
   }

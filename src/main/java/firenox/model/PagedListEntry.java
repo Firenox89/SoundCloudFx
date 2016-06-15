@@ -7,17 +7,17 @@ import java.util.Date;
  */
 public interface PagedListEntry {
 
-    int getId();
+  int getId();
 
-    Date getCreateAt();
+  Date getCreateAt();
 
-    ArtWork getArtwork();
+  ArtWork getArtwork();
 
-    WaveForm getWaveform();
+  WaveForm getWaveform();
 
-    String getTitle();
+  String getTitle();
 
-    String getUser_name();
+  String getUserName();
 
-    User getUser();
+  User getUser();
 }

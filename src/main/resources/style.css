@@ -1,17 +1,50 @@
+.scroll-pane {
+   -fx-border-width: 0px;
+   -fx-border-color: #161618;
+   -fx-background-color: #161618;
+}
+
 .scroll-pane > .viewport {
-   -fx-background-color: #ADADAD;
+   -fx-background-color: #161618;
    /*-fx-background-color: #999999;*/
    -fx-background-insets: 0;
    -fx-padding: 0;
    -fx-spacing: 0;
    -fx-border-width: 0px;
+   -fx-border-color: #161618;
 }
 
-.tab-pane {
-   -fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #dc143c, #661a33);
-   -fx-background-insets: 0;
-   -fx-padding: 0;
+/* The main scrollbar CSS class of ListView */
+.scroll-pane .scroll-bar:horizontal ,.scroll-pane  .scroll-bar:vertical{
+    -fx-background-color:transparent;
+    -fx-border-color: #161618;
+    -fx-background-color: #161618;
+   -fx-border-width: 0px;
 }
+
+/* The increment and decrement button CSS class of scrollbar */
+.scroll-pane .increment-button ,.scroll-pane .decrement-button {
+    -fx-background-color: #161618;
+    -fx-border-color: #161618;
+   -fx-border-width: 0px;
+     -fx-border-color: #161618;
+}
+
+/* The main scrollbar **track** CSS class  */
+.scroll-pane .scroll-bar:horizontal .track ,.scroll-pane .scroll-bar:vertical .track{
+     -fx-background-color: #161618;
+     -fx-border-color: #161618;
+     -fx-background-radius: 0em;
+}
+
+/* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+.scroll-pane .scroll-bar:horizontal .thumb,.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color:derive(black,90%);
+    -fx-background-insets: 0, 0, 0;
+    -fx-background-radius: 20;
+    -fx-border-color: #161618;
+}
+
 
 .vbox {
     -fx-alignment: center;
@@ -19,10 +52,33 @@
     -fx-background-color: #000021;
 }
 
+.hbox {
+    -fx-padding: 5;
+    -fx-spacing: 5;
+    -fx-alignment: center;
+    /*-fx-background-color: linear-gradient(from 25% 25% to 100% 100%, #dc143c, #661a33);*/
+    -fx-background-color: #000021;
+}
+
+.border-pane {
+   -fx-padding: 5, 5, 5, 5;
+   -fx-hgap: 5;
+   -fx-vgap: 5;
+   -fx-background-color: #161618;
+   -fx-border-width: 0px;
+   -fx-border-color: #161618;
+}
+
 .grid-pane {
     -fx-alignment: center;
     -fx-padding: 10, 0, 10, 0;
     -fx-hgap: 10;
+}
+
+.tab-pane {
+   -fx-background-color: #161618;
+   -fx-background-insets: 0;
+   -fx-padding: 0;
 }
 
 .tab-pane .tab-header-area .tab-header-background {
@@ -36,8 +92,9 @@
 .tab {
     -fx-background-insets: 0 1 0 1,0,0;
 }
+
 .tab-pane .tab {
-    -fx-background-color: #e6e6e6;
+   -fx-background-color: #161618;
 }
 
 .tab-pane .tab:selected {
@@ -45,13 +102,74 @@
 }
 
 .tab .tab-label {
-    -fx-alignment: CENTER;
-    -fx-text-fill: #828282;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
+    -fx-padding: 2 12 2 12;
+    -fx-border-color: #e2e2e2;
+    -fx-border-width: 0;
+    -fx-background-radius: 10;
+    -fx-background-color: #1d1d1d;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 11pt;
+    -fx-text-fill: #d8d8d8;
+    -fx-background-insets: 0 0 0 0, 0, 1, 2;
 }
 
 .tab:selected .tab-label {
     -fx-alignment: CENTER;
     -fx-text-fill: #FF9900;
+}
+
+.label {
+    -fx-font-size: 10pt;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-text-fill: white;
+    -fx-opacity: 0.6;
+}
+
+/*
+ * Metro style Push Button
+ * Author: Pedro Duque Vieira
+ * http://pixelduke.wordpress.com/2012/10/23/jmetro-windows-8-controls-on-java/
+ */
+.button {
+    -fx-padding: 2 12 2 12;
+    -fx-border-color: #e2e2e2;
+    -fx-border-width: 0;
+    -fx-background-radius: 10;
+    -fx-background-color: #1d1d1d;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 11pt;
+    -fx-text-fill: #d8d8d8;
+    -fx-background-insets: 0 0 0 0, 0, 1, 2;
+}
+
+.button:hover {
+    -fx-background-color: #3a3a3a;
+}
+
+.button:pressed, .button:default:hover:pressed {
+  -fx-background-color: white;
+  -fx-text-fill: #1d1d1d;
+}
+
+.button:focused {
+    -fx-border-color: white, white;
+    -fx-border-width: 0;
+    -fx-border-style: solid, segments(1, 1);
+    -fx-border-radius: 0, 0;
+    -fx-border-insets: 1 1 1 1, 0;
+}
+
+.button:disabled, .button:default:disabled {
+    -fx-opacity: 0.4;
+    -fx-background-color: #1d1d1d;
+    -fx-text-fill: white;
+}
+
+.button:default {
+    -fx-background-color: -fx-focus-color;
+    -fx-text-fill: #ffffff;
+}
+
+.button:default:hover {
+    -fx-background-color: derive(-fx-focus-color,30%);
 }

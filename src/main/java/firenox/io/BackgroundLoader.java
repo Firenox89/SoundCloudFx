@@ -1,7 +1,15 @@
 package firenox.io;
 
+import firenox.logger.LogType;
 import firenox.logger.Logger;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
@@ -9,119 +17,90 @@ import java.util.concurrent.*;
  * Created by firenox on 10/12/15.
  */
 public class BackgroundLoader extends Thread {
-    private static Logger log = new Logger(BackgroundLoader.class.getName());
-    private static ArrayList<Runnable> taskQueue = new ArrayList<>();
-    private static int SLEEP_TIME = 300;
-    private static BackgroundLoader instance = new BackgroundLoader();
-    private static SingleExecutor singleExecuter = new SingleExecutor();
-    static ExecutorService executor = Executors.newSingleThreadExecutor();
+  private static ExecutorService executor = Executors.newSingleThreadExecutor();
+  private static ExecutorService executorService;
+  private static Logger log = new Logger(BackgroundLoader.class.getName());
+  private static ArrayList<Runnable> taskQueue = new ArrayList<>();
+  private static int SLEEP_TIME = 300;
+  private static BackgroundLoader instance = new BackgroundLoader();
 
-    private BackgroundLoader() {
+  public static void init() {
+    if (!instance.isAlive()) {
+      instance.setDaemon(true);
+      //lets see if that is a wise thing to do
+      instance.setPriority(Thread.MIN_PRIORITY);
+      instance.setName("Network Thread");
+      instance.start();
     }
+    executor.submit(() -> Thread.currentThread().setName("Network Thread 2"));
+    executorService = Executors.newCachedThreadPool(new ThreadFactory() {
+      @Override
+      public Thread newThread(Runnable r) {
+        Thread t = new Thread(r);
+        t.setDaemon(true);
+        t.setPriority(Thread.NORM_PRIORITY-1);
+        return t;
+      }
+    });
+  }
 
-    public static void init() {
-        if (!instance.isAlive()) {
-            instance.setDaemon(true);
-            //lets see if that is a wise thing to do
-            instance.setPriority(Thread.NORM_PRIORITY - 1);
-            instance.start();
-        }
-        if (!singleExecuter.isAlive()) {
-            singleExecuter.setDaemon(true);
-            singleExecuter.start();
-        }
+  public static void createTask(Runnable task)
+  {
+    executorService.submit(
+    new Task<Void>(){
+      @Override
+      protected Void call() throws Exception {
+        task.run();
+        return null;
+      }
+    });
+  }
+
+  public static void addTaskLimitQueue(Runnable task) {
+    if (taskQueue.size() < 2)
+      taskQueue.add(task);
+  }
+
+  public static void addTaskWithTimeout(Runnable task, int timeout) {
+    Future future = executor.submit(() ->
+    {
+      try {
+        task.run();
+        //don't kill the executor
+      } catch (Throwable t) {
+        log.log(LogType.ERROR, t);
+      }
+    });
+    try {
+      future.get(timeout, TimeUnit.MILLISECONDS);
+    } catch (TimeoutException e) {
+      future.cancel(true);
+      //apache client hangs up, reinit wrapper
+      //should be done in the api wrapper
+      SessionHandler.init();
+      addTaskWithTimeout(task, timeout);
+      log.log(LogType.NETWORK, e);
+    } catch (Exception e) {
+      log.log(LogType.ERROR, e);
     }
+  }
 
-    public static void addTask(Runnable task) {
-        taskQueue.add(task);
-    }
-
-    public static void addTaskLimitQueue(Runnable task) {
-        if (taskQueue.size() < 3)
-            taskQueue.add(task);
-    }
-
-    public static void addTaskWithNoQueue(Runnable task) {
-        if (!singleExecuter.isRunning()) {
-            synchronized (singleExecuter) {
-                singleExecuter.setTask(task);
-                singleExecuter.notify();
-            }
+  @Override
+  public void run() {
+    while (true) {
+      try {
+        while (!taskQueue.isEmpty()) {
+          taskQueue.get(0).run();
+          taskQueue.remove(0);
         }
+      } catch (Exception e) {
+        log.log(LogType.ERROR, e);
+      }
+      try {
+        Thread.sleep(SLEEP_TIME);
+      } catch (InterruptedException e) {
+        log.log(LogType.ERROR, e);
+      }
     }
-
-    public static void addTaskWithTimeout(Runnable task, int timeout) {
-        Future future = executor.submit(() ->
-        {
-            try {
-                task.run();
-                //don't kill the executor
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        });
-        try {
-            future.get(timeout, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            //apache client hangs up, reinit wrapper
-            //should be done in the api wrapper
-            LogInHandler.init();
-            addTaskWithTimeout(task, timeout);
-            log.e(e);
-        } catch (Exception e) {
-            log.e(e);
-        }
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                while (!taskQueue.isEmpty()) {
-                    taskQueue.get(0).run();
-                    taskQueue.remove(0);
-                }
-            } catch (Exception e) {
-                log.e(e);
-            }
-            try {
-                Thread.sleep(SLEEP_TIME);
-            } catch (InterruptedException e) {
-                log.e(e);
-            }
-        }
-    }
-
-    static class SingleExecutor extends Thread {
-        private Runnable runnable;
-        private boolean running = false;
-
-        public boolean isRunning() {
-            return running;
-        }
-
-        public void setTask(Runnable runnable) {
-            this.runnable = runnable;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                if (runnable != null) {
-                    running = true;
-                    runnable.run();
-                    running = false;
-                    runnable = null;
-                }
-                synchronized (this) {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
+  }
 }

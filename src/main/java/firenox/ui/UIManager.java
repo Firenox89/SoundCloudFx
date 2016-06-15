@@ -1,5 +1,6 @@
 package firenox.ui;
 
+import firenox.logger.LogType;
 import firenox.logger.Logger;
 import firenox.media.AudioManager;
 import firenox.model.*;
@@ -10,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageBuilder;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -30,6 +32,7 @@ public class UIManager {
   private static PagedList<PagedListEntry> currentPlaylist;
   private static ArrayList<ChangeListener<? super Number>> widthListeners = new ArrayList<>();
   private static ArrayList<ChangeListener<? super Number>> viewportVListeners = new ArrayList<>();
+  private static ArrayList<Node> paneHistory = new ArrayList<>();
 
   public static void init(Stage stage) {
     root = new MenuBars();
@@ -46,9 +49,8 @@ public class UIManager {
 
 //    showProfile();
     showMyLikes();
+//    showMyStream();
   }
-
-  private static ArrayList<Node> paneHistory = new ArrayList<>();
 
   public static void setPane(Node node) {
     removeViewportVListeners();
@@ -73,6 +75,10 @@ public class UIManager {
     return root.getMainScrollPane().getHeight();
   }
 
+  public static double getScrollPaneWidth() {
+    return root.getMainScrollPane().getWidth();
+  }
+
   public static void addViewportVListener(ChangeListener<? super Number> listener) {
     viewportVListeners.add(listener);
     root.getMainScrollPane().vvalueProperty().addListener(listener);
@@ -95,11 +101,8 @@ public class UIManager {
     widthListeners.clear();
   }
 
-  public static double getWidth() {
-    return root.getMainScrollPane().getWidth();
-  }
-
   public static void showMyLikes() {
+    log.log(LogType.UI, "show My Likes");
     if (likesPane == null) {
       likesPane = new TracksPane(ModelManager.getMyLikes());
     }
@@ -107,10 +110,12 @@ public class UIManager {
   }
 
   public static void showTrackList(PagedList<PagedListEntry> tracks) {
+    log.log(LogType.UI, "show Tracklist");
     setPane(new TracksPane(tracks));
   }
 
   public static void showMyPlaylists() {
+    log.log(LogType.UI, "show My Playlists");
     if (playlistPane == null) {
       playlistPane = new PlaylistPane(ModelManager.getMyPlaylists());
     }
@@ -118,6 +123,7 @@ public class UIManager {
   }
 
   public static void showMyStream() {
+    log.log(LogType.UI, "show My Stream");
     if (streamPane == null) {
       streamPane = new TracksPane(ModelManager.getMyStream());
     }
@@ -125,14 +131,17 @@ public class UIManager {
   }
 
   public static void showProfile() {
+    log.log(LogType.UI, "show Playlist");
     showUser(ModelManager.getMe());
   }
 
   public static void showUser(User user) {
+    log.log(LogType.UI, "show Playlist");
     setPane(new UserPane(user));
   }
 
   public static void showTrack(Track track) {
+    log.log(LogType.UI, "show Track " + track);
     setPane(new TrackPane(track));
   }
 
@@ -151,7 +160,7 @@ public class UIManager {
 
       root.getTitleLabel().setText(track.getTitle());
       root.getTitleLabel().setOnMouseClicked(event -> showTrack(track));
-      root.getUserLabel().setText(track.getUser_name());
+      root.getUserLabel().setText(track.getUserName());
       root.getUserLabel().setOnMouseClicked(event -> showUser(track.getUser()));
       root.getProgressSlider().setMax(duration);
       root.getProgressSlider().valueProperty().addListener((observable1, oldValue1, newValue1) ->
@@ -177,22 +186,24 @@ public class UIManager {
     button.setStyle("-fx-background-image: null;");
     Platform.runLater(() -> {
       if (isPlaying)
-        button.setGraphic(UIUtils.SVGPaths.play);
+        button.setGraphic(UIUtils.SVGPaths.play.get());
       else
-        button.setGraphic(UIUtils.SVGPaths.pause);
+        button.setGraphic(UIUtils.SVGPaths.pause.get());
     });
   }
 
   public static void showPlaylist(PlayList entry) {
+    log.log(LogType.UI, "show Playlist");
     //TODO: should look somewhat similar to the UserPane
   }
 
-  public static void showVisualizer()
-  {
+  public static void showVisualizer() {
+    log.log(LogType.UI, "show Visualizer");
     setPane(new VisualizerPane());
   }
 
   public static void showStats() {
+    log.log(LogType.UI, "show Statistics");
     setPane(new StatsPane());
   }
 }
