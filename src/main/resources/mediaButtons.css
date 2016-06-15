@@ -1,0 +1,38 @@
+#panel {
+    -fx-background-color: #212121;
+}
+#prevBtn {
+    -fx-background-color: transparent;
+    -fx-background-size: 18 18;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:left;
+}
+#playBtn {
+    -fx-background-color: transparent;
+    -fx-background-size: 18 18;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:left;
+}
+#nextBtn {
+    -fx-background-color: transparent;
+    -fx-background-size: 18 18;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:left;
+}
+#coverPlaceholder {
+    -fx-background-color: transparent;
+    -fx-background-size: 18 18;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:left;
+}
+.label {
+    -fx-text-fill: #E9E9E9;
+}
+
+.button {
+    -fx-background-color: transparent;
+}
+
+.menu-button {
+    -fx-background-color: transparent;
+}
