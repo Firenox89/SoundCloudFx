@@ -2,14 +2,8 @@ package firenox.io;
 
 import firenox.logger.LogType;
 import firenox.logger.Logger;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 
@@ -33,14 +27,11 @@ public class BackgroundLoader extends Thread {
       instance.start();
     }
     executor.submit(() -> Thread.currentThread().setName("Network Thread 2"));
-    executorService = Executors.newCachedThreadPool(new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable r) {
-        Thread t = new Thread(r);
-        t.setDaemon(true);
-        t.setPriority(Thread.NORM_PRIORITY-1);
-        return t;
-      }
+    executorService = Executors.newCachedThreadPool(r -> {
+      Thread t = new Thread(r);
+      t.setDaemon(true);
+      t.setPriority(Thread.NORM_PRIORITY-1);
+      return t;
     });
   }
 

@@ -59,6 +59,9 @@ public class MenuBars extends BorderPane {
     Button visualizerButton = new Button("Visualizer");
     visualizerButton.setOnMouseClicked(event -> UIManager.showVisualizer());
 
+    Button logout = new Button("Logout");
+    logout.setOnMouseClicked(event -> UIManager.logout());
+
     int height = 25;
     toolBar.setPrefHeight(height);
     toolBar.setMinHeight(height);
@@ -69,7 +72,8 @@ public class MenuBars extends BorderPane {
         playlistButton,
         likesButton,
         statisticsButton,
-        visualizerButton);
+        visualizerButton,
+        logout);
 
     return toolBar;
   }

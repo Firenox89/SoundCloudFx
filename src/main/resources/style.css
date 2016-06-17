@@ -70,6 +70,7 @@
 }
 
 .grid-pane {
+    -fx-background-color: #161618;
     -fx-alignment: center;
     -fx-padding: 10, 0, 10, 0;
     -fx-hgap: 10;

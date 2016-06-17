@@ -20,8 +20,6 @@ public class SessionHandler {
   private static Properties credentials = new Properties();
   private static String CLIENT_ID;
   private static String CLIENT_SECRET;
-  private static String DEFAULT_LOGIN;
-  private static String DEFAULT_PASS;
   private static Logger log = Logger.getLogger(SessionHandler.class.getName());
   private static ApiWrapper wrapper;
   private static boolean loggedIn;
@@ -35,22 +33,11 @@ public class SessionHandler {
     }
     CLIENT_ID = credentials.getProperty("client.id");
     CLIENT_SECRET = credentials.getProperty("client.secret");
-    DEFAULT_LOGIN = credentials.getProperty("default.login");
-    DEFAULT_PASS = credentials.getProperty("default.pass");
+
+    if (RESET_WRAPPER_SER) WRAPPER_SER.delete();
   }
 
   public static void init() {
-    connect(DEFAULT_LOGIN, DEFAULT_PASS);
-    RequestManager.init(wrapper);
-  }
-
-
-  public static boolean isLoggedIn() {
-    return loggedIn;
-  }
-
-  public static void connect(String login, String password) {
-    if (RESET_WRAPPER_SER) WRAPPER_SER.delete();
     if (WRAPPER_SER.exists()) {
       try {
         wrapper = ApiWrapper.fromFile(WRAPPER_SER);
@@ -59,34 +46,47 @@ public class SessionHandler {
           log.log(LogType.NETWORK, "Token refreshed valid until: " + wrapper.getToken().getExpiresIn());
           wrapper.toFile(WRAPPER_SER);
         }
+        loggedIn = true;
         log.log(LogType.NETWORK, wrapper.getToken());
+        RequestManager.init(wrapper);
+        loginLatch.countDown();
       } catch (IOException e) {
-        e.printStackTrace();
+        log.log(LogType.ERROR, e);
       } catch (ClassNotFoundException e) {
-        e.printStackTrace();
+        log.log(LogType.ERROR, e);
       }
-    } else {
-      wrapper = serialises(login, password);
     }
-    if (wrapper != null)
-    {
-      loggedIn = true;
-      loginLatch.countDown();
-    }
-
   }
 
-  public static void waitForInit() {
-    if (isLoggedIn() == false) {
+  public static void connect(String login, String password) throws IOException {
+    wrapper = serialises(login, password);
+
+    if (wrapper != null) {
+      loggedIn = true;
+      wrapper.toFile(WRAPPER_SER);
+      RequestManager.init(wrapper);
+      loginLatch.countDown();
+    }
+  }
+
+  public static boolean loggedin()
+  {
+    return loggedIn;
+  }
+
+  public static boolean waitForLogin() {
+    if (loginLatch.getCount() > 0) {
       try {
+        log.log(LogType.DEBUG, "Wait for init");
         loginLatch.await();
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
     }
+    return loggedIn;
   }
 
-  private static ApiWrapper serialises(String login, String pass) {
+  private static ApiWrapper serialises(String login, String pass) throws IOException {
     if (CLIENT_ID == null || CLIENT_ID.equals(""))
       throw new IllegalStateException("Client_Id is empty.");
     if (CLIENT_SECRET == null || CLIENT_SECRET.equals(""))
@@ -103,12 +103,8 @@ public class SessionHandler {
         null    /* token */);
 
     Token token = null;
-    try {
-      token = wrapper.login(login /* login */, pass /* password */);
-      wrapper.toFile(WRAPPER_SER);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    token = wrapper.login(login /* login */, pass /* password */);
+    wrapper.toFile(WRAPPER_SER);
 
     System.out.println("got token from server: " + token);
 
@@ -121,5 +117,12 @@ public class SessionHandler {
       log.log(LogType.NETWORK, "Token refreshed valid until: " + wrapper.getToken().getExpiresIn());
       wrapper.toFile(WRAPPER_SER);
     }
+  }
+
+  public static void logout() {
+    loginLatch = new CountDownLatch(1);
+    WRAPPER_SER.delete();
+
+    loggedIn = false;
   }
 }

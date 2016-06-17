@@ -46,7 +46,7 @@ public class RequestManager {
    * @throws IOException
    */
   public static HttpResponse request(String request) throws IOException {
-    SessionHandler.waitForInit();
+    SessionHandler.waitForLogin();
     HttpResponse resp = wrapper.get(Request.to(request));
     if (resp.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
       log.log(LogType.NETWORK, resp.getStatusLine());
@@ -63,7 +63,7 @@ public class RequestManager {
    * @throws IOException
    */
   public static HttpResponse request(Request request) throws IOException {
-    SessionHandler.waitForInit();
+    SessionHandler.waitForLogin();
     return wrapper.get(request);
   }
 

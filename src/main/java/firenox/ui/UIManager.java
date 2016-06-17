@@ -1,5 +1,6 @@
 package firenox.ui;
 
+import firenox.io.SessionHandler;
 import firenox.logger.LogType;
 import firenox.logger.Logger;
 import firenox.media.AudioManager;
@@ -11,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.StageBuilder;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -24,6 +24,8 @@ import java.util.ArrayList;
 public class UIManager {
 
   private static Logger log = Logger.getLogger(UIManager.class.getName());
+  private static final int DEFAULT_WIDTH = 800;
+  private static final int DEFAULT_HEIGHT = 600;
   private static MenuBars root;
   private static TracksPane likesPane;
   private static TracksPane streamPane;
@@ -33,13 +35,33 @@ public class UIManager {
   private static ArrayList<ChangeListener<? super Number>> widthListeners = new ArrayList<>();
   private static ArrayList<ChangeListener<? super Number>> viewportVListeners = new ArrayList<>();
   private static ArrayList<Node> paneHistory = new ArrayList<>();
+  private static Stage stage;
 
   public static void init(Stage stage) {
+    UIManager.stage = stage;
+    if (!SessionHandler.loggedin())
+    {
+      new LoginScreen(stage, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+    else
+    {
+      initPlayerUI(stage);
+    }
+  }
+
+  public static void logout()
+  {
+    SessionHandler.logout();
+    new LoginScreen(stage, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+  }
+
+  public static void initPlayerUI(Stage stage)
+  {
     root = new MenuBars();
 
     AudioManager.getPlayerFx().bindVolume(root.getVolumeSlider().valueProperty());
 
-    Scene scene = new Scene(root, 800, 600);
+    Scene scene = new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
     scene.getStylesheets().add("style.css");
 
 //    stage.initStyle(StageStyle.UNDECORATED);
@@ -50,6 +72,7 @@ public class UIManager {
 //    showProfile();
     showMyLikes();
 //    showMyStream();
+
   }
 
   public static void setPane(Node node) {
