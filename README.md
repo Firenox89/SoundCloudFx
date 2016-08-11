@@ -14,4 +14,4 @@ JavaFx based Soundcloud Player
 
 ## Development
 
-I plan to move the codebase from java to kotlin in the next few months since its just the supirior language.
+I plan to move the codebase from java to kotlin in the next few months since its just the superior language.
