@@ -3,7 +3,7 @@ SoundCloudFx
 
 JavaFx based Soundcloud Player
 
-![alt tag](https://raw.githubusercontent.com/Firenox89/SoundCloudFx/master/images/images/LikesViewScreenshot.png)
+![alt tag](https://raw.githubusercontent.com/Firenox89/SoundCloudFx/master/images/LikesViewScreenshot.png)
 
 ## Features
 
