@@ -3,5 +3,6 @@ language: java
 jdk:
   - oraclejdk8
 
-gradle check
+script:
+  - gradle check
 
