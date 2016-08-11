@@ -1,12 +1,8 @@
 package firenox.ui;
 
-import com.soundcloud.api.CloudAPI;
-import firenox.io.BackgroundLoader;
 import firenox.io.SessionHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,8 +10,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,7 +18,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static com.soundcloud.api.CloudAPI.*;
+import static com.soundcloud.api.CloudAPI.InvalidTokenException;
 
 /**
  * Created by firenox on 10/6/15.
@@ -83,9 +77,7 @@ public class LoginScreen {
     try {
       SessionHandler.connect(user, pw);
       UIManager.initPlayerUI(stage);
-    }
-    catch (InvalidTokenException e)
-    {
+    } catch (InvalidTokenException e) {
       actiontarget.setFill(Color.FIREBRICK);
       actiontarget.setText("Password incorrect.");
     } catch (IOException e) {

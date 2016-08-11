@@ -69,8 +69,7 @@ public class SessionHandler {
     }
   }
 
-  public static boolean loggedin()
-  {
+  public static boolean loggedin() {
     return loggedIn;
   }
 

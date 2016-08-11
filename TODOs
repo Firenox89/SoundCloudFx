@@ -1,3 +1,7 @@
+Misc
+    move to kotlin
+    use rx for event stuff
+
 UI
     Menu...
     Search bar
@@ -9,6 +13,7 @@ UI
     Keyboard shortcuts
     Tags
     Equalizer
+    use something like android's Recycleview for tracklists
 
 Logic
     UI corresponding things

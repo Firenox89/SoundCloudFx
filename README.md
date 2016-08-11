@@ -1,19 +1,17 @@
-# SoundCloudFx
+SoundCloudFx
+============
+
 JavaFx based Soundcloud Player
 
-# Requirements
+![alt tag](https://raw.githubusercontent.com/Firenox89/SoundCloudFx/master/images/images/LikesViewScreenshot.png)
 
-[Apache HttpClient][]
+## Features
 
-[json-java][]
+- Log into your acount
+- Play Sounds from your likes, playlists and stream
+- like/unlike tracks
+- very basic visualizer
 
-[Souncloud-api-wrapper][]
+## Development
 
-[JavaFx 8u72][] (Playing https media streams is finally supported since there)
-
-[Apache HttpClient]: http://hc.apache.org/httpcomponents-client-ga/
-[HttpMime]: http://hc.apache.org/httpcomponents-client-ga/httpmime
-[json-java]: http://json.org/java/
-[Souncloud-api-wrapper]: https://github.com/Firenox89/java-api-wrapper
-[java-image-scaling]: https://github.com/mortennobel/java-image-scaling
-[JavaFx 8u72]: http://hg.openjdk.java.net/openjfx/8u-dev/rt
+I plan to move the codebase from java to kotlin in the next few months since its just the supirior language.

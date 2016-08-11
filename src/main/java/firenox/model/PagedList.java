@@ -5,16 +5,17 @@ import firenox.io.Http;
 import firenox.io.RequestManager;
 import firenox.logger.LogType;
 import firenox.logger.Logger;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 /**
  * Created by firenox on 10/18/15.
  */
-public class PagedList<E> extends ArrayList<E> {
+public class PagedList<E> extends SimpleListProperty<E> {
 
   private final static int LOADING_STEP_SIZE = 3;
   private final int limit;
@@ -23,10 +24,9 @@ public class PagedList<E> extends ArrayList<E> {
   private String next_href = null;
   private boolean allLoaded = false;
   private Logger log = Logger.getLogger(getClass().getName());
-  private ArrayList<EntriesChangedListener> entriesChangedListeners = new ArrayList<>();
-  private ArrayList<EntryAddAt0Listener> entryAddedAt0Listeners = new ArrayList<>();
 
   public PagedList(String url, int limit, Class<E> type) {
+    super(FXCollections.observableArrayList());
     this.url = url;
     this.limit = LOADING_STEP_SIZE;
     this.type = type;
@@ -78,10 +78,6 @@ public class PagedList<E> extends ArrayList<E> {
 
   private void parseResult(JSONObject response) {
     try {
-      ArrayList<E> newEntries;
-      newEntries = new ArrayList<>();
-      addAll(newEntries);
-
       JSONArray jsonArray = response.getJSONArray("collection");
       for (int i = 0; i < jsonArray.length(); i++) {
         String kind;
@@ -99,27 +95,23 @@ public class PagedList<E> extends ArrayList<E> {
         if ((type == Track.class || type == PagedListEntry.class)
             && (kind.equals("track") || kind.equals("track-repost"))) {
           E entry = (E) ModelManager.getTrack(jsonArray.getJSONObject(i));
-          newEntries.add(entry);
+          Platform.runLater(() -> add(entry));
         } else if ((type == PlayList.class || type == PagedListEntry.class)
             && kind.equals("playlist") || kind.equals("playlist-repost")) {
           E entry = (E) ModelManager.getPlaylist(jsonArray.getJSONObject(i));
-          newEntries.add(entry);
+          Platform.runLater(() -> add(entry));
         } else if (type == Comment.class && kind.equals("comment")) {
           E entry = (E) ModelManager.getComment(jsonArray.getJSONObject(i));
-          newEntries.add(entry);
+          Platform.runLater(() -> add(entry));
         } else {
           log.log(LogType.JSON, "Kind-Type mismatch kind = " + kind + " type =" + type.getName());
 //                            if (kind.equals("playlist"))
 //                                log.e(Http.formatJSON(json));
         }
       }
-      final ArrayList<E> finalNewEntries = newEntries;
-      entriesChangedListeners.forEach(listener -> listener.entriesChanged(finalNewEntries));
-      addAll(finalNewEntries);
     } catch (JSONException e) {
       log.log(LogType.JSON, e);
     }
-
   }
 
   @Override
@@ -130,23 +122,7 @@ public class PagedList<E> extends ArrayList<E> {
     return super.get(index);
   }
 
-  @Override
-  public void add(int index, E element) {
-    super.add(index, element);
-    entryAddedAt0Listeners.forEach(EntryAddAt0Listener::entryAdded);
-  }
-
-  public void addEntryAddAt0Listener(EntryAddAt0Listener listener) {
-    entryAddedAt0Listeners.add(listener);
-  }
-
-  public void addNewEntriesLoadedListener(EntriesChangedListener listener) {
-    log.log(LogType.UI, "addNewEntriesLoadedListener");
-    entriesChangedListeners.add(listener);
-  }
-
-  public void removeListener(EntriesChangedListener listener) {
-    log.log(LogType.UI, "removeListener");
-    entriesChangedListeners.remove(listener);
+  public boolean loadingComplete() {
+    return allLoaded;
   }
 }

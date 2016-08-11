@@ -15,7 +15,7 @@ public class BackgroundLoader extends Thread {
   private static ExecutorService executorService;
   private static Logger log = new Logger(BackgroundLoader.class.getName());
   private static ArrayList<Runnable> taskQueue = new ArrayList<>();
-  private static int SLEEP_TIME = 300;
+  private static int SLEEP_TIME = 50;
   private static BackgroundLoader instance = new BackgroundLoader();
 
   public static void init() {
@@ -30,21 +30,20 @@ public class BackgroundLoader extends Thread {
     executorService = Executors.newCachedThreadPool(r -> {
       Thread t = new Thread(r);
       t.setDaemon(true);
-      t.setPriority(Thread.NORM_PRIORITY-1);
+      t.setPriority(Thread.NORM_PRIORITY - 1);
       return t;
     });
   }
 
-  public static void createTask(Runnable task)
-  {
+  public static void createTask(Runnable task) {
     executorService.submit(
-    new Task<Void>(){
-      @Override
-      protected Void call() throws Exception {
-        task.run();
-        return null;
-      }
-    });
+        new Task<Void>() {
+          @Override
+          protected Void call() throws Exception {
+            task.run();
+            return null;
+          }
+        });
   }
 
   public static void addTaskLimitQueue(Runnable task) {

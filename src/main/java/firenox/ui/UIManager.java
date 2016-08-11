@@ -23,9 +23,9 @@ import java.util.ArrayList;
  */
 public class UIManager {
 
+  private static final int DEFAULT_WIDTH = 1280;
+  private static final int DEFAULT_HEIGHT = 1024;
   private static Logger log = Logger.getLogger(UIManager.class.getName());
-  private static final int DEFAULT_WIDTH = 800;
-  private static final int DEFAULT_HEIGHT = 600;
   private static MenuBars root;
   private static TracksPane likesPane;
   private static TracksPane streamPane;
@@ -39,24 +39,19 @@ public class UIManager {
 
   public static void init(Stage stage) {
     UIManager.stage = stage;
-    if (!SessionHandler.loggedin())
-    {
+    if (!SessionHandler.loggedin()) {
       new LoginScreen(stage, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    }
-    else
-    {
+    } else {
       initPlayerUI(stage);
     }
   }
 
-  public static void logout()
-  {
+  public static void logout() {
     SessionHandler.logout();
     new LoginScreen(stage, DEFAULT_WIDTH, DEFAULT_HEIGHT);
   }
 
-  public static void initPlayerUI(Stage stage)
-  {
+  public static void initPlayerUI(Stage stage) {
     root = new MenuBars();
 
     AudioManager.getPlayerFx().bindVolume(root.getVolumeSlider().valueProperty());
@@ -160,7 +155,8 @@ public class UIManager {
 
   public static void showUser(User user) {
     log.log(LogType.UI, "show Playlist");
-    setPane(new UserPane(user));
+    //TODO: repair UserPane
+//    setPane(new UserPane(user));
   }
 
   public static void showTrack(Track track) {
@@ -193,6 +189,8 @@ public class UIManager {
       });
 
       root.getTrackTime().setText((duration / 60) + ":" + secondFormater.format(duration % 60));
+
+      root.getSidebar().setCurrentPlaylist(currentPlaylist);
 
       AudioManager.getPlayerFx().setProgressTimeListener((observable, oldValue, newValue) ->
       {
@@ -228,5 +226,9 @@ public class UIManager {
   public static void showStats() {
     log.log(LogType.UI, "show Statistics");
     setPane(new StatsPane());
+  }
+
+  public static PagedList<PagedListEntry> getCurrentPlaylist() {
+    return currentPlaylist;
   }
 }

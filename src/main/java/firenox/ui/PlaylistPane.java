@@ -1,8 +1,10 @@
 package firenox.ui;
 
 import firenox.model.PagedList;
+import firenox.model.PagedListEntry;
 import firenox.model.PlayList;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
@@ -38,7 +40,7 @@ public class PlaylistPane extends BorderPane implements PlayerPane {
         {
           double playlistsSize = playLists.size();
           double d = (playlistsSize - 3) / playlistsSize;
-          if (newValue.doubleValue() > d) {
+          if (newValue.doubleValue() > d && !playLists.loadingComplete()) {
             playLists.loadNextEntries();
           }
         });
@@ -72,36 +74,27 @@ public class PlaylistPane extends BorderPane implements PlayerPane {
         playList, artWidth, artHeigth)));
 
     //update container on list changes
-    playLists.addNewEntriesLoadedListener((list) ->
-        Platform.runLater(() -> {
-          list.forEach(playList ->
-              tilePane.getChildren().add(
-                  UIUtils.buildPlayListTile((PlayList) playList, artWidth, artHeigth)));
-          //tabs don't update their content automatically, silly tabs...
-          //Vbox -> PlaylistPane -> TabSkin -> TabPane
+    playLists.addListener((ListChangeListener<PagedListEntry>) c -> {
+      while (c.next()) {
+        c.getAddedSubList().forEach(entry -> Platform.runLater(() -> {
+          tilePane.getChildren().add(UIUtils.buildPlayListTile((PlayList) entry, artWidth, artHeigth));
+//          tabs don't update their content automatically, silly tabs...
+//          Vbox -> PlaylistPane -> TabSkin -> TabPane
           getLastParent(tilePane).requestLayout();
         }));
+      }
+    });
 
-    int hfit = (int) (UIManager.getScrollPaneHeight()/ (artHeigth + 20) * columns);
-    System.out.println("hfit + \" \" +playLists.size() = " + hfit + " " +playLists.size());
-    if (playLists.size() < hfit)
-    {
+    int hfit = (int) (UIManager.getScrollPaneHeight() / (artHeigth + 20) * columns);
+    while (playLists.size() < hfit && !playLists.loadingComplete()) {
       playLists.loadNextEntries();
     }
     return tilePane;
   }
 
-  private Parent getLastParent(Parent parent)
-  {
-    if (parent.getParent() == null)
-    {
-      System.out.println("parent = [" + parent + "]");
-    }
-    else
-    {
-      System.out.println("parent = " + parent);
+  private Parent getLastParent(Parent parent) {
+    if (parent.getParent() != null)
       parent = getLastParent(parent.getParent());
-    }
     return parent;
   }
 }

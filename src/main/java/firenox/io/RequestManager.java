@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 /**
  * Delegates API requests to the the logged in ApiWrapper
- * <p>
+ * <p/>
  * Created by firenox on 10/29/15.
  */
 public class RequestManager {

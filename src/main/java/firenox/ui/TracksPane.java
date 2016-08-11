@@ -3,15 +3,12 @@ package firenox.ui;
 import firenox.logger.Logger;
 import firenox.model.PagedList;
 import firenox.model.PagedListEntry;
-import firenox.model.Track;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 
 /**
  * Created by firenox on 10/8/15.
@@ -88,19 +85,7 @@ public class TracksPane extends BorderPane implements PlayerPane {
   }
 
   private Node buildListView() {
-    VBox vbox = new VBox();
-
-    //build Track container for list view
-    trackList.forEach(t -> UIUtils.addToTrackContainer(t, trackList, dimensions, vbox));
-
-    //update container on list changes
-    trackList.addNewEntriesLoadedListener(list ->
-        Platform.runLater(() ->
-            list.forEach(t ->
-                UIUtils.addToTrackContainer((PagedListEntry) t, trackList,dimensions, vbox))));
-
-    trackList.addEntryAddAt0Listener(() -> UIUtils.addToTrackContainer(trackList.get(0), trackList, dimensions, vbox, 0));
-    return vbox;
+    return new TrackListView(trackList, dimensions);
   }
 
   private TilePane buildTileView() {
@@ -125,11 +110,11 @@ public class TracksPane extends BorderPane implements PlayerPane {
         t, trackList, width, heigth)));
 
     //update container on list changes
-    trackList.addNewEntriesLoadedListener(list ->
-        Platform.runLater(() ->
-            list.forEach(t ->
-                tilePane.getChildren().add(
-                    UIUtils.buildTrackTile((Track) t, trackList, width, heigth)))));
+//    trackList.addNewEntriesLoadedListener(list ->
+//        Platform.runLater(() ->
+//            list.forEach(t ->
+//                tilePane.getChildren().add(
+//                    UIUtils.buildTrackTile((Track) t, trackList, width, heigth)))));
     return tilePane;
   }
 }

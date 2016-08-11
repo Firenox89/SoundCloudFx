@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,13 +30,18 @@ public abstract class CacheableImage {
     if (!cacheDir.exists()) {
       cacheDir.mkdirs();
     }
-    index = Arrays.stream(cacheDir.listFiles())
-        .filter(File::isFile)
-        .collect(Collectors.toMap(File::getName, Function.<File>identity()));
+    if (cacheDir.listFiles() != null) {
+      index = Arrays.stream(cacheDir.listFiles())
+          .filter(File::isFile)
+          .collect(Collectors.toMap(File::getName, Function.<File>identity()));
+    } else {
+      index = new HashMap<String, File>();
+    }
     return index;
   }
 
   protected File cacheFile(String url) throws IOException {
+    log.log(LogType.NETWORK, "Caching url " + url);
     File fileToCache = new File(getCachePath() + File.separator + getNameFromUrl(url));
     InputStream is;
     if (useFallback()) {
@@ -77,7 +83,7 @@ public abstract class CacheableImage {
 
   public InputStream getResourceAsStream(String url, Map<String, File> cacheIndex) throws IOException {
     File file = cacheIndex.get(getNameFromUrl(url));
-    if (file == null) {
+    if (file == null || !file.exists()) {
       file = cacheFile(url);
       cacheIndex.put(getNameFromUrl(url), file);
     }

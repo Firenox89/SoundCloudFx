@@ -4,16 +4,10 @@ import firenox.io.BackgroundLoader;
 import firenox.logger.Logger;
 import firenox.media.AudioManager;
 import firenox.model.*;
-import javafx.concurrent.Task;
-import javafx.geometry.Insets;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.FillRule;
 import javafx.scene.shape.SVGPath;
@@ -29,18 +23,8 @@ public class UIUtils {
 
   private static Logger log = Logger.getLogger(UIUtils.class.getName());
 
-  private static int count = 0;
 
-  private static void toggleTrackLike(Track track, SVGPath path) {
-    if (track.doILike()) {
-      path.setFill(Color.GRAY);
-    } else {
-      path.setFill(Color.ORANGE);
-    }
-    track.toggleLike();
-  }
-
-  private static void asyncArtworkAdd(ImageView view, ArtWork artWork, int width, int heigth) {
+  public static void asyncArtworkAdd(ImageView view, ArtWork artWork, int width, int heigth) {
     BackgroundLoader.createTask(() ->
     {
       try {
@@ -62,7 +46,7 @@ public class UIUtils {
     });
   }
 
-  private static void setTrack(PagedListEntry entry, PagedList<PagedListEntry> list) {
+  public static void setTrack(PagedListEntry entry, PagedList<PagedListEntry> list) {
     if (entry instanceof Track)
       AudioManager.getPlayerFx().open(list, list.indexOf(entry));
     else if (entry instanceof PlayList)
@@ -110,118 +94,6 @@ public class UIUtils {
     return box;
   }
 
-  public static void addToTrackContainer(PagedListEntry t,
-                                         PagedList<PagedListEntry> trackList,
-                                         ListContainerDimensions dimensions,
-                                         Pane target) {
-    addToTrackContainer(t, trackList, dimensions, target, -1);
-  }
-
-  public static void addToTrackContainer(PagedListEntry entry,
-                                         PagedList<PagedListEntry> list,
-                                         ListContainerDimensions dimensions,
-                                         Pane target,
-                                         int position) {
-    new Task<Void>() {
-      @Override
-      protected Void call() throws Exception {
-        HBox box = new HBox();
-
-        box.setSpacing(5);
-        box.setPadding(new Insets(5));
-
-        ArtWork artwork = entry.getArtwork();
-        WaveForm waveForm = entry.getWaveform();
-        ImageView artwork_view = new ImageView();
-        artwork_view.setFitWidth(dimensions.getArtWidth());
-        artwork_view.setFitHeight(dimensions.getArtHeigth());
-        Canvas wave_view = waveForm.getCanvas(dimensions.getWaveWidth(), dimensions.getWaveHeigth());
-        Label title = new Label(entry.getTitle());
-        Label userName = new Label(entry.getUser().getUsername());
-
-        asyncArtworkAdd(artwork_view, artwork, dimensions.getArtWidth(), dimensions.getArtHeigth());
-
-        artwork_view.setOnMouseClicked(mouseEvent -> setTrack(entry, list));
-        wave_view.setOnMouseClicked(mouseEvent -> {
-          double s = mouseEvent.getX() / wave_view.getWidth();
-          AudioManager.getPlayerFx().openAndSeek(list, list.indexOf(entry), s);
-        });
-        if (entry instanceof Track)
-          title.setOnMouseClicked(event -> UIManager.showTrack((Track) entry));
-        else if (entry instanceof PlayList)
-          title.setOnMouseClicked(event -> UIManager.showPlaylist((PlayList) entry));
-        userName.setOnMouseClicked(event -> UIManager.showUser(entry.getUser()));
-
-        SVGPath likeSVG = SVGPaths.likePath.get();
-        if (entry instanceof Track && ((Track) entry).doILike()) {
-          likeSVG.setFill(Color.ORANGE);
-          likeSVG.setOnMouseClicked(event -> toggleTrackLike((Track) entry, likeSVG));
-        } else if (entry instanceof Track) {
-          likeSVG.setFill(Color.GRAY);
-          likeSVG.setOnMouseClicked(event -> toggleTrackLike((Track) entry, likeSVG));
-        } else {
-          likeSVG.setFill(Color.GRAY);
-        }
-
-        SVGPath repostSVG = SVGPaths.repostPath.get();
-        repostSVG.setFill(Color.GRAY);
-
-        SVGPath addToPlaylistSVG = SVGPaths.addToPlaylistPath.get();
-        addToPlaylistSVG.setFill(Color.GRAY);
-
-        HBox icons = new HBox();
-        icons.setSpacing(2);
-
-        icons.getChildren().add(likeSVG);
-        icons.getChildren().add(repostSVG);
-        icons.getChildren().add(addToPlaylistSVG);
-
-        VBox trackInfo = new VBox();
-        trackInfo.getChildren().add(userName);
-        trackInfo.getChildren().add(title);
-        icons.getChildren().add(trackInfo);
-
-        VBox wave_con = new VBox();
-        wave_con.getChildren().add(icons);
-        wave_con.getChildren().add(wave_view);
-
-        if (entry instanceof PlayList) {
-          count = 0;
-          PlayList playlist = (PlayList) entry;
-          playlist.getTrackList()
-              .stream()
-              .filter(e -> count++ < 5)
-              .map(e -> (Track) e)
-              .forEach(t -> {
-                try {
-                  ImageView art = new ImageView(new Image(t.getArtwork().getCustomSize(20, 20)));
-                  art.setOnMouseClicked(mouseEvent -> setTrack(t, playlist.getTrackList()));
-                  Label userLabel = new Label(count + 1 + " " + t.getUser().getUsername() + " - ");
-                  userLabel.setOnMouseClicked(mouseEvent -> UIManager.showUser(t.getUser()));
-                  userLabel.setStyle("-fx-text-fill: #828282;");
-                  Label titleLabel = new Label(t.getTitle());
-                  titleLabel.setOnMouseClicked(mouseEvent -> setTrack(t, playlist.getTrackList()));
-                  wave_con.getChildren().add(new HBox(
-                      art,
-                      userLabel,
-                      titleLabel));
-                } catch (IOException e) {
-                  e.printStackTrace();
-                }
-              });
-        }
-
-        box.getChildren().addAll(artwork_view, wave_con);
-
-        if (position == -1) {
-          target.getChildren().add(box);
-        } else {
-          target.getChildren().add(position, box);
-        }
-        return null;
-      }
-    }.run();
-  }
 
   public enum SVGPaths {
     likePath("likePath"),
@@ -237,7 +109,6 @@ public class UIUtils {
     shuffle("shuffle"),
     volumeSpeaker("volumeSpeaker");
 
-    private final String name;
     private static final HashMap<String, String> names = new HashMap<>();
 
     //TODO: remove the unnneded list
@@ -255,6 +126,8 @@ public class UIUtils {
       names.put("shuffle", "M24 22h-3.172l-5-5 5-5h3.172v5l7-7-7-7v5h-4c-0.53 0-1.039 0.211-1.414 0.586l-5.586 5.586-5.586-5.586c-0.375-0.375-0.884-0.586-1.414-0.586h-6v4h5.172l5 5-5 5h-5.172v4h6c0.53 0 1.039-0.211 1.414-0.586l5.586-5.586 5.586 5.586c0.375 0.375 0.884 0.586 1.414 0.586h4v5l7-7-7-7v5z");
       names.put("volumeSpeaker", "M13 30c-0.26 0-0.516-0.102-0.707-0.293l-7.707-7.707h-3.586c-0.552 0-1-0.448-1-1v-10c0-0.552 0.448-1 1-1h3.586l7.707-7.707c0.286-0.286 0.716-0.372 1.090-0.217s0.617 0.519 0.617 0.924v26c0 0.404-0.244 0.769-0.617 0.924-0.124 0.051-0.254 0.076-0.383 0.076z");
     }
+
+    private final String name;
 
 
     SVGPaths(String name) {

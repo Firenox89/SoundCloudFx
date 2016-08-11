@@ -84,8 +84,7 @@ public class UserPane extends VBox implements PlayerPane {
         Platform.runLater(() -> tabPane.getTabs().add(likesTab));
         tracksTab = new TrackTab("Tracks", user.getTracks());
         Platform.runLater(() -> tabPane.getTabs().add(tracksTab));
-        if (user.getReposts() != null)
-        {
+        if (user.getReposts() != null) {
           repostTab = new TrackTab("Reposts", user.getReposts());
           Platform.runLater(() -> tabPane.getTabs().add(repostTab));
         }

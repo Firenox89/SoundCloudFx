@@ -18,10 +18,10 @@ import java.util.Properties;
 public class ModelManager {
 
   public static String CACHE_PATH_FALLBACK = System.getProperty("java.io.tmpdir") + File.separator + "soundcloudFx";
+  public static String ARTWORKS_CACHE_PATH;
+  public static String WAVE_CACHE_PATH;
   private static Properties properties = new Properties();
-  public static String CACHE_PATH = properties.getProperty("caching.path", CACHE_PATH_FALLBACK);
-  public static String ARTWORKS_CACHE_PATH = CACHE_PATH + File.separator + "artworks";
-  public static String WAVE_CACHE_PATH = CACHE_PATH + File.separator + "waves";
+  public static String CACHE_PATH;
   private static HashMap<String, User> userList = new HashMap<>();
   private static HashMap<String, Track> trackList = new HashMap<>();
   private static HashMap<String, PlayList> playlistsList = new HashMap<>();
@@ -33,6 +33,14 @@ public class ModelManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    CACHE_PATH = properties.getProperty("caching.path", CACHE_PATH_FALLBACK);
+    if (CACHE_PATH.isEmpty())
+      CACHE_PATH = CACHE_PATH_FALLBACK;
+    WAVE_CACHE_PATH = CACHE_PATH + File.separator + "waves";
+    ARTWORKS_CACHE_PATH = CACHE_PATH + File.separator + "artworks";
+    new File(WAVE_CACHE_PATH).mkdirs();
+    new File(ARTWORKS_CACHE_PATH).mkdirs();
+    log.log(LogType.RESOURCE, WAVE_CACHE_PATH);
   }
 
   static {

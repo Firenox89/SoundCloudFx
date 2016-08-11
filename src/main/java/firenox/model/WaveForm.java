@@ -58,6 +58,7 @@ public class WaveForm extends CacheableImage {
 
   @Override
   protected String getCachePath() {
+    System.out.println("ModelManager.WAVE_CACHE_PATH = " + ModelManager.WAVE_CACHE_PATH);
     return ModelManager.WAVE_CACHE_PATH;
   }
 }

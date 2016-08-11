@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 public class MenuBars extends BorderPane {
 
 
-  public ScrollPane scrollPane = new ScrollPane();
+  ScrollPane scrollPane = new ScrollPane();
   Slider progressSlider = new Slider();
   Slider volumeSlider = new Slider();
   ImageView titleView = new ImageView();
@@ -23,11 +23,13 @@ public class MenuBars extends BorderPane {
   Label trackTime = new Label("00:00");
   Label currentTime = new Label("00:00");
   Button playButton = new Button();
+  private Sidebar sidebar = new Sidebar();
 
   public MenuBars() {
     setTop(buildTopPane());
     setCenter(scrollPane);
     scrollPane.getStylesheets().add("style.css");
+    setLeft(sidebar);
     setBottom(buildBottomPane());
   }
 
@@ -78,7 +80,6 @@ public class MenuBars extends BorderPane {
     return toolBar;
   }
 
-
   public FlowPane buildBottomPane() {
     FlowPane bottom = new FlowPane();
 
@@ -112,7 +113,6 @@ public class MenuBars extends BorderPane {
     volumeButton.setGraphic(UIUtils.SVGPaths.volumeSpeaker.get());
     volumeButton.getItems().add(new CustomMenuItem(volumeSlider));
 
-
     VBox artistTrackBox = new VBox();
     artistTrackBox.getChildren().addAll(artist, track);
 
@@ -121,12 +121,18 @@ public class MenuBars extends BorderPane {
         nextButton,
         repeatButton,
         shuffleButton,
+        currentTime,
         progressSlider,
+        trackTime,
         volumeButton,
         titleView,
         artistTrackBox);
 
     return bottom;
+  }
+
+  public Sidebar getSidebar() {
+    return sidebar;
   }
 
   public Slider getVolumeSlider() {
